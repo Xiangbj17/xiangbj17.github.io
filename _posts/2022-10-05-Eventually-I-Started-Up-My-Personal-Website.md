@@ -136,7 +136,7 @@ Jekyll的[主题官网](https://jekyllthemes.io/)上有很多漂亮的模板，�
 
 
 
-## 3. Change the defaults
+## (iii) Change the defaults
 
 打开下载的代码，修改里面的一些默认设置。
 
@@ -151,7 +151,7 @@ Jekyll的[主题官网](https://jekyllthemes.io/)上有很多漂亮的模板，�
 
  
 
-## 4. Host on Github
+## (iv) Host on Github
 
 1. 把本地的更新同步到Github仓库，在终端输入：
 
