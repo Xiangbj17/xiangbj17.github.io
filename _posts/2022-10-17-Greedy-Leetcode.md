@@ -45,15 +45,16 @@ res = 1
 ## 题解
 
 ```python
-def findContentChildren(self, g, s):
-	g.sort()
-  s.sort()
-  child, cookie = 0, 0
-  while child < len(g) and cookie < len(s):
-  	if g[child] <= s[cookie]:
-  		child += 1
-  	cookie += 1
-  return child
+class Solution(object):
+    def findContentChildren(self, g, s):
+        g.sort()
+        s.sort()
+        child, cookie = 0, 0
+        while child < len(g) and cookie < len(s):
+            if g[child] <= s[cookie]:
+                child += 1
+            cookie += 1
+        return child
 ```
 
 
@@ -92,18 +93,17 @@ res = 4  # [1,2,1]
 ### 题解
 
 ```python
-def candy(self, ratings):
-	if len(ratings) == 1:
-     return 1
-  res = [1] * len(ratings)
-	for i in range(len(ratings)-1):
-  	if ratings[i+1] > ratings[i]:
-       res[i+1] = res[i] + 1
-        
-  for i in range(len(ratings)-1, 0, -1):
-    if ratings[i-1] > ratings[i]:
-       res[i-1] = max(res[i-1], res[i]+1)
-        
-  return sum(res)
+class Solution(object):
+    def candy(self, ratings):
+        if len(ratings) == 1:
+            return 1        
+        res = [1] * len(ratings)
+        for i in range(len(ratings)-1):
+            if ratings[i+1] > ratings[i]:
+                res[i+1] = res[i] + 1       
+        for i in range(len(ratings)-1, 0, -1):
+            if ratings[i-1] > ratings[i]:
+                res[i-1] = max(res[i-1], res[i]+1)   
+        return sum(res)
 ```
 
