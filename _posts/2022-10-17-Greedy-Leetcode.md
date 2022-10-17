@@ -38,7 +38,7 @@ res = 1
 
 ## 题解
 
-```
+```python
 def findContentChildren(self, g, s):
 	g.sort()
   s.sort()
