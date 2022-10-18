@@ -17,7 +17,7 @@ render_with_liquid: false
 
 # 原则1：央行印钱，速买黄金
 
-![image-20221018140110341](../pics/image-20221018140110341.png)
+![image-20221018140110341](../assets/img/pics/image-20221018140110341.png)
 
 也不一定是黄金，也可以是股票，大宗商品等等能保值的东西
 
@@ -29,7 +29,7 @@ render_with_liquid: false
 
 # 原则2：以史为镜，可以知兴替
 
-![image-20221018140331954](../pics/image-20221018140331954.png)
+![image-20221018140331954](../assets/img/pics/image-20221018140331954.png)
 
 ## Changing Orders
 
@@ -41,7 +41,7 @@ render_with_liquid: false
 
 # The Big Cycle
 
-![image-20221018142727068](../pics/image-20221018142727068.png)
+![image-20221018142727068](../assets/img/pics/image-20221018142727068.png)
 
 上面这张图展示的是一个世界霸权的形成过程
 
@@ -61,11 +61,11 @@ render_with_liquid: false
 
 ### 霸权图是从下面的国家&强度图总结出来的：
 
-<img src="../pics/image-20221018142857516.png" alt="image-20221018142857516" style="zoom: 33%;" />
+<img src="../assets/img/pics/image-20221018142857516.png" alt="image-20221018142857516" style="zoom: 33%;" />
 
 把上面的图稍微平滑一下就是这个↓，也就是上面的“The Big Cycle”
 
-<img src="../pics/image-20221018143047607.png" alt="image-20221018143047607" style="zoom:33%;" />
+<img src="../assets/img/pics/image-20221018143047607.png" alt="image-20221018143047607" style="zoom:33%;" />
 
 
 
@@ -73,7 +73,7 @@ render_with_liquid: false
 
 ## Big Cycle的三阶段
 
-![image-20221018145700697](../pics/image-20221018145700697.png)
+![image-20221018145700697](../assets/img/pics/image-20221018145700697.png)
 
 ### The Rise
 
