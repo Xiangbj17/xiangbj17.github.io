@@ -107,3 +107,107 @@ class Solution(object):
         return sum(res)
 ```
 
+
+
+# 435. [Non-overlapping Intervals (Medium)](https://leetcode.cn/problems/non-overlapping-intervals/)
+
+## 题目大意
+
+- `intervals:` 表示一些区间`[start, end]`的集合
+- 有一些区间是重叠的，需要移掉一些使剩下的不重叠
+- 返回 **需要移除区间的最小数量**
+
+## 示例
+
+```python
+intervals = [[1,2],[2,3],[3,4],[1,3]]
+res = 1 # 移除[1, 3]
+```
+
+## 思路
+
+其实这个题和研一的时候上的算法课一个例题很像，好像是互不相容的工时什么什么的，忘了。但主要就是，当两个区间meet的时候，比如[1, 2]和[1, 3]，肯定优先选[1, 2]，因为这样留给后面的空间就越大，需要移除的区间就越少。
+
+感觉贪心问题好像都得从特例比较去分析贪心策略。
+
+贪心策略：
+
+- 按照右边界排序，就从左向右遍历。策略是右边界越小越好，只要右边界越小，留给下一个区间的空间就越大。
+- 按照左边界排序，就从右向左遍历。策略是左边界数值越大越好，这样就给前一个区间的空间就越大。
+
+## 题解
+
+```python
+class Solution(object):
+    def eraseOverlapIntervals(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: int
+        """
+        if len(intervals) == 1:
+            return 0
+        intervals.sort(key=lambda x:x[1])
+        res = 0
+        right = intervals[0][1]
+        for i in range(1, len(intervals)):
+            if intervals[i][0] < right:
+                # overlap case
+                res += 1
+            else:
+                right = intervals[i][1]
+        return res
+```
+
+
+
+
+
+# 452. [ Minimum Number of Arrows to Burst Balloons (Medium)](https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/)
+
+## 题目大意
+
+- `points:` 是包含一些区间的集合
+- 一个int可以同时被包含在不同的区间中，不如说这个数命中这些区间
+- 返回能命中这些区间的最少的int数量
+
+## 示例
+
+```python
+points = [[10,16],[2,8],[1,6],[7,12]]
+res = 2 # 6在[2, 8]和[1, 6]中，8在[10, 16]和[7, 12]中
+```
+
+## 思路
+
+和上一道题很像很像。可以通过这样的例子来思考贪心准则:
+
+如果有[1, 2], [2, 3], [1, 4]，很简单能想到pick 2 来命中三个区间。但什么样的算法能找到2呢？
+
+- 这个排序是根据右边升序，也就是越往后右边界越大。那么显然我选择当前的右边界，在后面更有胜算，因为右边界肯定被涵盖在后面的集合中，左边则不然 ==》选择当前的右边界做基准
+
+- 如果后一个区间的左边界小于等于当前右边界，说明这个数对后一个区间也有效，那么保留这个数
+- 如果后一个区间的右边界大于当前右边界，说明这个数对后面的区间无效了，res += 1
+
+贪心准则：按照区间ending排序，选择当前区间右边界x作为基准，只要后面的区间包含当前区间的右边界，通通用x来命中这几个区间
+
+## 题解
+
+```python
+class Solution(object):
+    def findMinArrowShots(self, points):
+        """
+        :type points: List[List[int]]
+        :rtype: int
+        """
+        if len(points) == 1:
+            return 1
+        points.sort(key=lambda x:x[1])
+        res = 1
+        right = points[0][1]
+        for i in range(1, len(points)):
+            if points[i][0] > right:
+                res += 1
+                right = points[i][1]
+        return res
+```
+
