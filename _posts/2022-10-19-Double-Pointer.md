@@ -229,7 +229,25 @@ res = "BANC"
 ## 题解
 
 ```python
-
+class Solution(object):
+    def minWindow(self, s, t):
+        mem = defaultdict(int)
+        for c in t: mem[c]+=1
+        total = len(t)
+        res = (0, float('inf'))
+        i = 0 # LEFT POINTER
+        for j, char in enumerate(s):
+          	if mem[char] > 0: total -= 1
+            mem[char] -= 1
+            if total == 0:
+                while mem[s[i]] < 0:
+                  	mem[s[i]] += 1
+                  	i += 1
+                if j-i < res[1]-res[0]: res = (i, j)
+                mem[s[i]] += 1
+                total += 1
+                i += 1
+        return '' if res[1]>len(s) else s[res[0]:res[1]+1]
 ```
 
 
