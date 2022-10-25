@@ -30,18 +30,23 @@ render_with_liquid: false
 
 # Datasets
 
-|                             Name                             | Detail                                                       | from       | get  |
-| :----------------------------------------------------------: | ------------------------------------------------------------ | ---------- | ---- |
-| French partition<br /> (cv-corpus-7.0-2021-07-21) <br />of the Common Voice (CV) corpus | 410k utterances<br />from 600 speakers<br />duration of 16.42 hours<br />provided with segmented speech utterances | 2209.11061 |      |
-|                                                              |                                                              |            |      |
-|                                                              |                                                              |            |      |
+|             Name             | Detail                                                       | from       | get  |
+| :--------------------------: | ------------------------------------------------------------ | ---------- | ---- |
+| the Common Voice (CV) corpus | 410k utterances<br />from 600 speakers<br />duration of 16.42 hours<br />provided with segmented speech utterances | 2209.11061 |      |
+|           Audioset           | **Clip-level Label<br />**5000h+                             | 2105.04065 |      |
+|        clean Aurora 4        |                                                              | 2105.04065 |      |
+|           DCASE18            |                                                              | 2105.04065 |      |
+|                              |                                                              |            |      |
+|                              |                                                              |            |      |
+|                              |                                                              |            |      |
 
 # Evaluation Indicators
 
 1. AUC (Area Under the Curve)
    - https://www.youtube.com/watch?v=OAl6eAyP-yo
 
-
+2. FER
+3. Event-F1
 
 # 2209.11061
 
@@ -101,5 +106,89 @@ CROSS-DOMAIN VOICE ACTIVITY DETECTION WITH SELF-SUPERVISED REPRESENTATIONS (*Uni
 
 
 
-# Teacher_student_2105.04065
+# Multitask_2103.01661
 
+Comment: Results are not convincable and architecture is too simple, but there is still some thing useful(Like cross-attention, VAD labeling toolkit and online inference propose.)
+
+## Basic
+
+1. The model is firstly pre-trained with wav2vec 2.0 framework.
+2. Then, ASR and VAD tasks are jointly trained with a MTL(multi-task learning) technique.
+   1. To **reduce the computational cost of VAD**, we only use the output features from the bottom feature extraction module of the network architecture to perform the VAD task.
+   2. This design is more consistent with human cognition process and infants’ language learning process: In **Jusczyk’s study [20]**: <u>infants firstly have the ability to detect the language sound patterns before they recognize words.</u>
+3. Propose a **cross-task attention module** to learn interactive information between ASR and VAD.
+4. Use **chunk-hopping mechanism** to support **online** processing.
+   1. Enables the model to encode on segmented frame chunks one after another.
+
+## Model
+
+### The Overall Architecture
+
+![image-20221025154122032](/Users/bajianxiang/Library/Application Support/typora-user-images/image-20221025154122032.png)
+
+### Chunk-hopping Mechanism
+
+![image-20221025154420868](/Users/bajianxiang/Library/Application Support/typora-user-images/image-20221025154420868.png)
+
+​	To adapt to different real-time demands, the sizes of **chunks are randomly set from 0.5 second to 3 seconds** and the <u>spliced chunks are all fixed to 0.5 second.</u>
+
+### Loss Function
+
+1. For ASR: CTC Loss
+2. For VAD: Cross Entropy Loss 
+
+### Online Inference Algorithm
+
+<img src="/Users/bajianxiang/Library/Application Support/typora-user-images/image-20221025155042423.png" alt="image-20221025155042423" style="zoom:50%;" />
+
+## Experiments
+
+### 2-Stages:
+
+1. Train a **single task ASR model** by finetuning the wav2vec 2.0 pre- trained model in the first stage.
+2. Train our **multi-task model** by finetuning the ASR model **from the first stage**.(Using chunk-hopping mechanism )
+
+### Obtain the labels of VAD:
+
+- Use the [silero-vad toolkit](https://github.com/snakers4/silero-vad) to generate annotations from speech.
+
+### Datasets
+
+- HKUST Mandarin Chinese conversational telephone speech recognition (HKUST)
+  - HKUST consists of long conversations with speech and non-speech parts. 
+- Librispeech[27] dataset
+  - 1000h of training data split into ”clean-100h”, ”clean-360h” and ”other- 500h” subsets
+  - development and testsets that are split into simple (“clean”) and harder (“other”) subsets. 
+  - To reduce the experiment cost, we only train the model with the “clean-100h” part of the training data. 
+
+### Wave2Vec Model
+
+- We use publicly released pre-trained wav2vec2.0 base model
+  - composed of a seven-block CNN feature ex- tracter and a 12-layer transformer encoder.
+- Fine-Tuning Stage
+  - follow the settings described in original Paper
+
+### Hardware
+
+All the experiments are performed on 4 GeForce RTX 2080 Ti GPUs.
+
+## Results
+
+Compare the proposed **MTL method** with the VAD system trained with **the same CNN architecture(Single Task Learning)** in the proposed model architecture.
+
+3 Metrix:
+
+- detection error rate (DetER): measures the fraction of time that is not attributed correctly to speech or to non-speech and is computed as:
+  $$
+  DetER=\frac{N_{false\_alarm}+N_{miss}}{N_{total}}
+  $$
+
+  - false alarm is the number of false positive speech predictions,
+  - miss is the number of false negtive speech predictions
+  - total is the total number of predictions.
+
+- False alarm rate(FA)
+
+- Missed detection rate(Miss)
+
+![image-20221025160925533](/Users/bajianxiang/Library/Application Support/typora-user-images/image-20221025160925533.png)
