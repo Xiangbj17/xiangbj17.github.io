@@ -201,3 +201,100 @@ class Solution(object):
         return res
 ```
 
+# 540. [Single Element in a Sorted Array (Midium)](https://leetcode.cn/problems/single-element-in-a-sorted-array/)
+
+## 题意
+
+- `nums`: 整数数组，非降序排列，其中仅有一个元素只出现一次，其余元素均出现两次
+- 返回只出现了一次的元素
+- 解决方案必须满足 `O(log n)` 时间复杂度和 `O(1)` 空间复杂度。
+
+$$
+2^x=n, x = log_2n
+$$
+
+
+
+## 示例
+
+```python
+nums = [1,1,2,3,3,4,4,8,8]
+res = 2
+```
+
+## 思路
+
+观察示例可以发现
+
+```
+nums = [1,1,2,3,3,4,4,8,8]
+odev = [e,o,e,o,e,o,e,o,e]
+```
+
+- 对于出现在target左边的元素：
+  - 如果这个数所在的序号`i`为奇数，那么与之相等的数一定在它的左边
+  - 偶数，则与之相等的数一定在其右边
+- 对于出现在target右边的元素：
+  - 如果`i`为奇数，那么与之相等的数一定在它的右边
+  - 偶数，则在左边
+
+通过上述规律来判断target究竟在左半边还是在右半边，即：
+
+- 如果mid是偶数，与之相等的数在其左边，那么target在左半边，反之在右半边
+- 如果mid是奇数，与之相等的数在其左边，那么target在右半边，反之在左半边
+
+### 这道题的技巧：
+
+利用按位异或的性质，可以得到 mid 和相邻的数之间的如下关系，其中 ^ 是按位异或运算符：
+
+- 如果mid是偶数，mid ^ 1 = mid + 1
+- 如果mid是奇数，mid ^ 1 = mid - 1
+
+也就是说，如果 `nums[mid ^ 1] == nums[mid]`，说明：
+
+- 如果mid是偶数，那么判断mid是否与mid+1相等
+- 如果mid是奇数，那么判断mid是否与mid-1相等
+
+True则都能说明target在右边，根据这个写代码
+
+### 和模板不一样的地方:
+
+#### 第一处
+
+如果用了`nums[mid ^ 1] == nums[mid]`这种判断方式，在相等的情况下，能说明mid是有匹配的；
+
+但如果不相等的话，有两种情况
+
+1. mid有匹配，但在 `mid ^ 1` 的反方向一边
+2. mid没有匹配，就是target
+
+鉴于无法排除情况2，所以在不相等的情况下，不能贸然做`right=mid-1`的操作，只能`right=mid`
+
+#### 第二处
+
+循环的条件需要变成`left < right`，因为如果`left=right`，没有计算下去的必要
+
+### 第三处
+
+循环返回left或者right都行，可以通过示例来推，最后一次循环，三个指针分别在0,1,2处
+
+并且`nums[mid^1] = nums[mid]`，根据算法，`left`跑到2去，也就是left=right=2
+
+但mid还在1，所以我们返回left和right都行
+
+## 题解
+
+```python
+class Solution(object):
+    def singleNonDuplicate(self, nums):
+        if len(nums) == 1: return nums[0]
+        left, right = 0, len(nums)-1
+        while left < right:
+            mid = (left + right) // 2
+            if nums[mid^1] == nums[mid]:
+                left = mid + 1
+            else:
+                right = mid
+        return nums[left]
+```
+
