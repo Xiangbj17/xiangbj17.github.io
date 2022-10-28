@@ -26,7 +26,9 @@ render_with_liquid: false
    - Dataset involved
    - Several tasks suggested
 
-   
+4. VAD Ground Truth Labelling
+   - Ramirez VAD [Javier Ram´ırez, Jos´e C Segura, Carmen Ben´ıtez, Luz Garc´ıa, and Antonio Rubio, “Statistical voice activity detection using a multiple observation likelihood ratio test,” IEEE Signal Processing Letters, vol. 12, no. 10, pp. 689–692, 2005.] [from 用浏览器打开_VAD_SE_2010.12484.pdf]
+   -  [silero-vad toolkit](https://github.com/snakers4/silero-vad)
 
 # Datasets
 

@@ -91,13 +91,113 @@ class Solution(object):
         return [start, end]
 ```
 
+# 81. [Search in Rotated Sorted Array II (Medium)](https://leetcode.cn/problems/search-in-rotated-sorted-array-ii/)
+
+## 题意
+
+`nums`原本是一个非降序排列整数数组，可是为了增加题目难度，把它在未知的某个下标 `k`（`0 <= k < nums.length`）上进行了**旋转**，使之变为
+$$
+[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]
+$$
+对于旋转后的数组`nums`，看看`target`是否存在，存在则返回True，否则返回False
+
+Attention：数组中可能会存在重复的元素
+
+## 示例
+
+```python
+nums = [2,5,6,0,0,1,2], target = 0
+res = True
+```
+
+## 思路
+
+还是用二分查找的模板，主要有两个点：
+
+1. left-mid之间和mid-right之间肯定有一边是有序的，需要先判断哪边有序，然后利用这一边做排除法。
+   - 有没有序很好判断，如果`nums[left]<nums[mid]`，那就是左边有序，如果大于，右边有序
+   - 接下来，通过左右极小极大值判断target是不是在有序的这一段里
+     - 在就继续搜索这里面
+     - 不在就继续搜索另一半
+2. `nums[left]=nums[mid]`的情况是有可能出现的，此时无法判断哪边有序
+   - 这时候，我们首当其冲地判断一下`nums[mid] == target`
+     - True就谢天谢地直接返回
+     - False的话，既然left和mid相等，那left和target也不等，直接left+1即可，往后走一个。
+
+## 题解
+
+```python
+class Solution(object):
+    def search(self, nums, target):
+        if len(nums) == 1: return nums[0] == target
+        left, right = 0, len(nums)-1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] == target: return True
+            if nums[mid] == nums[left]: 
+                left += 1
+            elif nums[mid] > nums[left]:
+                # Left half in order
+                if nums[left] <= target < nums[mid]: right = mid - 1
+                else: left = mid + 1
+            else:
+                # Right half in order
+                if nums[mid] < target <= nums[right]: left = mid + 1
+                else: right = mid - 1
+        return False
+```
 
 
 
+# 154. [Find Minimum in Rotated Sorted Array II (Hard)](https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array-ii/)
 
+## 题意
 
+`nums`原本是一个非降序排列整数数组，可是为了增加题目难度，把它在未知的某个下标 `k`（`0 <= k < nums.length`）上进行了**旋转**，使之变为
+$$
+[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]
+$$
+对于旋转后的数组`nums`，寻找其最小值
 
+Attention：数组中可能会存在重复的元素
 
+## 示例
 
+```python
+nums = [1,3,5]
+return 1
+```
 
+## 思路
+
+和上一题一样，连注意事项都一模一样。
+
+因为可能会出现重复的元素所以需要处理mid和right或者mid和left相等的情况。
+
+## 题解
+
+```python
+class Solution(object):
+    def findMin(self, nums):
+        if len(nums) == 1: return nums[0]
+        res = float('inf')
+        left, right = 0, len(nums)-1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] < res:
+                res = nums[mid]
+            if nums[mid] == nums[right]:
+                # Hald to distinguish
+                right -= 1
+                continue
+            elif nums[mid] < nums[right]:
+                # Right half in order
+                right = mid - 1 # search in left
+            else:
+                # Left Half in order, search right
+                if nums[left] < res:
+                    res = nums[left]
+                left = mid + 1 # search in right
+        return res
+```
 
