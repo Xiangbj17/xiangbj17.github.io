@@ -61,25 +61,35 @@ original = [1, 6, 5, 3, 7]
 3. 总是选择最后一个元素作为pivot
 4. 选择中位数作为pivot
 
-2和3比较好写，比较方便，因为避免了两次交换过程。下面的代码选择以第一个元素作为pivot.
+2和3比较好写，比较方便，因为避免了两次交换过程。下面的代码选择以第一个元素作为pivot，代码分为quickSort的递归部分和Partition的排序部分。排序的大概过程如下：
+
+- 选择第一个元素作为pivot
 
 ## 代码
 
 ```python
-def quickSort(nums, left, right):
-  if left >= right:
-    return
-  origin_l, origin_r = left, right
-  pivot = nums[left]
-	while left < right:
-    while left < right and nums[left] <= pivot:
-      left += 1
-    while left < right and nums[right] >= pivot:
-      right += 1
-    nums[left], nums[right] = nums[right], nums[left]
-  nums[left] = pivot
-  quickSort(nums, origin_l, left)
-  quickSort(nums, left+1, original_r)
-    
+def partition(arr, low, high): 
+    i = low-1  # 按兵不动 i
+    pivot = arr[high]     
+    for j in range(low , high):  # 探寻前线 j
+        if arr[j] <= pivot:          
+            i = i+1
+            arr[i],arr[j] = arr[j],arr[i] 
+    arr[i+1],arr[high] = arr[high],arr[i+1]
+    return i+1 
+  
+def quickSort(arr, low, high): 
+    if low < high: 
+        pi = partition(arr, low, high) 
+        quickSort(arr, low, pi-1) 
+        quickSort(arr, pi+1, high)
+    return arr
 ```
 
+## 运行模拟
+
+<img src="/Users/bajianxiang/Library/Application Support/typora-user-images/image-20221031211332034.png" alt="image-20221031211332034" style="zoom:50%;" />
+
+
+
+# 我真的很讨厌排序，这章放最后了
