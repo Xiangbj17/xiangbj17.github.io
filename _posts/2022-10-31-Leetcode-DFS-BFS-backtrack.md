@@ -19,7 +19,7 @@ P.S.
   - 记录每个遍历过的节点的父节点，若一个节点被再次遍历且父节点不同，则说明有环
 - 有时我们可能会需要对已经搜索过的节点进行标记，以防止在遍历时重复搜索某个节点
 
-## 回溯(backtracking) 
+## 回溯(Backtracking) 
 
 DFS的记录节点状态的深度优先搜索。
 
@@ -33,9 +33,11 @@ DFS的记录节点状态的深度优先搜索。
 
 ## 广度优先搜索(Breadth-first Search, BFS)
 
+广度优先搜索是**一层层**地进行遍历，不追求先去找到一个叶节点（问题的解），而是先把每一步的所有情况都给整出来。
 
+BFS的实现会用FIFO的Queue，一般是pop(0)，而不能直接pop()，记住这个即可。
 
-# 695. [Max Area of Island (Medium)](https://leetcode.cn/problems/max-area-of-island/)
+# DFS 695. [Max Area of Island (Medium)](https://leetcode.cn/problems/max-area-of-island/)
 
 ## 题意
 
@@ -92,7 +94,7 @@ class Solution(object):
 
 
 
-# 547. [Number of Provinces (Medium)](https://leetcode.cn/problems/number-of-provinces/)
+# DFS 547. [Number of Provinces (Medium)](https://leetcode.cn/problems/number-of-provinces/)
 
 ## 题意
 
@@ -141,7 +143,7 @@ class Solution(object):
 
 
 
-# 51. [N-Queens (Hard)](https://leetcode.cn/problems/n-queens/)
+# Backtrack 51. [N-Queens (Hard)](https://leetcode.cn/problems/n-queens/)
 
 ## 题意 / 示例
 
@@ -196,5 +198,88 @@ class Solution(object):
         columns, diag1, diag2 = set(), set(), set()
         backtrack(0)
         return res
+```
+
+# BFS 934. [Shortest Bridge [Medium]](https://leetcode.cn/problems/shortest-bridge/)
+
+## 题意
+
+- `grid:` 二元矩阵，大小为`n x n`，其中1表示陆地，0表示水域。
+- 在`grid`中恰巧有两座岛，通过将任意数量的 `0` 变为 `1` ，以使两座岛连接起来，变成**一座岛** 。
+- 求：必须翻转的0的最小数量。
+
+## 示例
+
+```python
+grid = [[0,1,0],
+        [0,0,0],
+        [0,0,1]]
+res = 2
+```
+
+## 思路
+
+1. 首先去搜索一座岛，找到他的边缘 (DFS)
+2. 对这座岛屿的边界进行扩展，每次向外扩1位(BFS)
+3. 遇到第二座岛屿的时候，扩展的数量即为所求
+
+## 题解
+
+```python
+class Solution(object):
+    def shortestBridge(self, grid):
+
+        def dfs(i, j):
+            if i < 0 or j < 0 or i >= max_row or j >= max_col:
+                return False
+            if grid[i][j] == 1:
+                grid[i][j] = 2
+                edge_flag = False
+                for m in range(4):
+                    temp_res = dfs(i + direction[m], j + direction[m + 1])
+                    edge_flag = edge_flag or temp_res
+                if edge_flag:
+                    edges.append((i,j))
+            elif grid[i][j] == 0:
+                return True
+            return False
+
+        direction = [-1, 0, 1, 0, -1]
+        max_row = len(grid)
+        max_col = len(grid[0])
+        edges = []
+        findFirstIsland = False
+        for row in range(max_row):
+            for col in range(max_col):
+                if grid[row][col] == 1:
+                    dfs(row, col)
+                    findFirstIsland = True
+                    break
+            if findFirstIsland: 
+                break
+        
+        def check_valid(aa, bb):
+            if aa < 0 or bb < 0 or aa >= max_row or bb >= max_col:
+                return False
+            return True
+        
+        res = -1
+        while True:
+            edges_len = len(edges)
+            res += 1
+            for _ in range(edges_len):
+                x, y = edges.pop(0)
+                for n in range(4):
+                    dx, dy = x + direction[n], y + direction[n+1]
+                    if not check_valid(dx, dy):
+                        continue
+                    temp_val = grid[dx][dy]
+                    if temp_val == 2: 
+                        continue
+                    elif temp_val == 0:
+                        grid[dx][dy] = 2
+                        edges.append((dx, dy))
+                    else:
+                        return res           
 ```
 
