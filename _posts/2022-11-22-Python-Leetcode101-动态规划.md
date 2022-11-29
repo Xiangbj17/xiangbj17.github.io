@@ -240,3 +240,66 @@ class Solution(object):
         return mat
 ```
 
+# 221. [Maximal Square (Medium)](https://leetcode.cn/problems/maximal-square/)
+
+## 题意
+
+- `matrix`是一个`m x n`的二元矩阵
+- 返回`matrix`中全是1的最大正方形面积
+
+## 示例
+
+![img](https://assets.leetcode.com/uploads/2020/11/26/max1grid.jpg)
+
+```python
+Input: matrix = [["1","0","1","0","0"],
+                 ["1","0","1","1","1"],
+                 ["1","1","1","1","1"],
+                 ["1","0","0","1","0"]]
+Output: 4
+```
+
+## 思路
+
+- 定义`dp[i][j]`表示以(i, j)为右下角的全由1构成的最大正方形**边长**
+
+- 状态转移方程`dp[i][j] = min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1]) + 1`
+
+- 边界条件，当`matrix[i][j] = 0`时`dp[i][j] = 0 `
+
+  ## 题解
+
+  ```python
+  class Solution(object):
+      def maximalSquare(self, matrix):
+          max_row, max_col = len(matrix), len(matrix[0])
+          if max_row == 0 or max_col == 0:
+              return 0
+          length = 0
+          dp = [[0 for _ in range(max_col)] for _ in range(max_row)]
+          for i in range(max_row):
+              for j in range(max_col):
+                  if matrix[i][j] == "0":
+                      dp[i][j] = 0
+                  else:
+                      if i == 0 or j == 0:
+                          dp[i][j] = 1
+                      else:
+                          dp[i][j] = min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1]) + 1
+                      if dp[i][j] > length:
+                          length = dp[i][j]
+          return length * length
+  ```
+
+  
+
+
+
+
+
+
+
+
+
+
+
