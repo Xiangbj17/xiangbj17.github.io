@@ -37,7 +37,7 @@ render_with_liquid: false
   
   - 计算和储存子问题的解
 
-
+# 一维动态规划问题
 
 # 70. [Climbing Stairs （Easy）](https://leetcode.cn/problems/climbing-stairs/)
 
@@ -132,6 +132,8 @@ class Solution(object):
 ```
 
 
+
+# 二维动态规划问题
 
 # 542. [ 01 Matrix (Medium)](https://leetcode.cn/problems/01-matrix/)
 
@@ -291,9 +293,153 @@ Output: 4
           return length * length
   ```
 
-  
+  # 分割类动态规划问题
+
+# 279. [Perfect Squares (Medium)](https://leetcode.cn/problems/perfect-squares/)
+
+## 题意
+
+`n`是一个在1和10000之间的正整数，求其最少可以由几个完全平方数相加构成
+
+## 示例
+
+```python
+Input: n = 12
+Output: 3
+Explanation: 12 = 4 + 4 + 4.
+```
+
+## 思路
+
+- 定义: 记`dp[i]`表示数字i最少可以由多少个平方数构成
+
+- 状态转移方程
+  $$
+  dp[i]=min(dp[i-1^2]+dp[i-2^2]+dp[i-3^2]+\dots) + 1
+  $$
+
+- 边界条件: `dp[0] = 0`
+
+## 题解
+
+```python
+class Solution(object):
+    def numSquares(self, n):
+        dp = [0]
+        for i in range(1, n+1):
+            j, temp = 1, float('inf')
+            while j * j <= i:
+                temp = min(temp, dp[i-j*j]+1)
+                j += 1
+            dp.append(temp)
+        return dp[-1]
+```
 
 
+
+# 91. [Decode Ways (Medium)](https://leetcode.cn/problems/decode-ways/)
+
+## 题意
+
+给定一个全是数字的字符串，按照`'A' -> '1', 'Z' -> 26`的方式解码，问有多少种解码方式
+
+## 示例
+
+```python
+Input: s = "226"
+Output: 3 # "226" could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6)
+```
+
+## 思路
+
+- 和上一个题一样，都属于“分割类”的动态规划，也就是说，`dp[i]`可能同时和多个`dp[j] (j < i)`有联系
+
+- 定义：`dp[i]`表示到第`i`个字符为止，有多少种解码方式
+
+- 状态转移方程
+  $$
+  dp[i] = valid(dp[i-1]) + valid(dp[i-2])
+  $$
+
+  - 也就是说，如果`s[i]`在`1~9`中，`dp[i]`的解码方式得加上`dp[i-1]`的
+  - 如果`s[i-1:i]`在`10~26`中，`dp[i]`的解码方式得加上`dp[i-2]`的
+
+- 边界条件：
+
+  - `dp[0]=1`，空字符串有1种解码方式
+  - 注意，这种表示方法下，`dp[1]`才表示`s[0]`的解码方式
+
+- 压缩解空间
+
+  - 可以用三个变量进行状态转移，不必用整个数组
+
+# 题解
+
+```python
+class Solution(object):
+    def numDecodings(self, s):
+        a, b = 0, 1
+        # a = dp[i-2], b = dp[i-1]
+        for i in range(1, len(s)+1):
+            temp = 0   # dp[i]
+            if s[i-1] != '0':
+                temp += b
+            if i > 1 and s[i-2] != '0' and int(s[i-2:i]) <= 26:
+                temp += a
+            a, b = b, temp
+        return temp
+
+```
+
+
+
+
+
+# 139. [Word Break (Medium)](https://leetcode.cn/problems/word-break/)
+
+## 题意
+
+- 给定一个单词表`wordDict`和一个字符串`s`
+
+- 如果`s`可以由单词表中的词组成，返回`True`，否则返回`False`
+
+  ## 示例
+
+  ```python
+  Input: s = "leetcode", wordDict = ["leet","code"]
+  Output: true
+  Explanation: Return true because "leetcode" can be segmented as "leet code".
+  ```
+
+  ## 思路
+
+- 这一题也属于分割类型动态规划
+- 和之前一样，注意用`dp[i+1]`表示`s[i]`的解情况，因为边界条件是空字符串能解
+
+- 定义：`dp[i]`表示到第`i-1`个字符串为止(包含它本身)的解
+- 状态转移：
+  - 对于`wordDict`中的任意一个词`word`
+  - 如果`s[i-len(word):i] == word`成立，则`dp[i] = True and dp[i-len(word)]`
+- 边界条件：`dp[0] = True`
+
+## 题解
+
+```python
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        dp = [True] + [False] * len(s)
+        for i in range(1, len(s)+1):
+            for word in wordDict:
+                if i >= len(word) and s[i-len(word):i] == word:
+                    dp[i] = True and dp[i-len(word)]
+                    if dp[i]: break
+        return dp[-1]
+            
+```
+
+
+
+# 子序列问题
 
 
 
