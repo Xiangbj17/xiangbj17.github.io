@@ -39,7 +39,7 @@ render_with_liquid: false
 
 # 一维动态规划问题
 
-# 70. [Climbing Stairs （Easy）](https://leetcode.cn/problems/climbing-stairs/)
+# 70. [Climbing Stairs (Easy)](https://leetcode.cn/problems/climbing-stairs/)
 
 ## 题意
 
@@ -373,7 +373,7 @@ Output: 3 # "226" could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6)
 
   - 可以用三个变量进行状态转移，不必用整个数组
 
-# 题解
+## 题解
 
 ```python
 class Solution(object):
@@ -390,10 +390,6 @@ class Solution(object):
         return temp
 
 ```
-
-
-
-
 
 # 139. [Word Break (Medium)](https://leetcode.cn/problems/word-break/)
 
@@ -437,13 +433,120 @@ class Solution(object):
             
 ```
 
-
-
 # 子序列问题
 
+对于子序列问题，第一种动态规划方法是，定义一个 `dp` 数组，其中 `dp[i]` 表示以 `i` 结尾的子序列的性质。在处理好每个位置后，统计一遍各个位置的结果即可得到题目要求的结果。
 
+第二种动态规划方法是，定义一个 `dp` 数组，其中 `dp[i]` 表示到位置 `i` 为止 的子序列的性质，并不必须以 `i` 结尾。这样 dp 数组的最后一位结果即为题目所求，不需要再对每个位置进行统计。
 
+# 300. [Longest Increasing Subsequence (Meduim)](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
+## 题意
+
+给定一个整数数组`nums`，返回最长的**严格递增子序列**长度（不必连续）
+
+## 示例
+
+```python
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: res = 4  # [2,3,7,101], therefore the length is 4.
+```
+
+## 思路
+
+- 定义：`dp[i]`表示到第`i`个数为止，最长的严格递增子序列长度。
+
+  - <font color=red>注意：可能会出现`dp[i]<dp[j]`且`i>j`的情况，此时`dp[-1]`不再是问题的解</font>
+    - 比如：`[1, 3, 6, 7, 9, 4, 10, 5, 6]`
+    - 对应：`[1, 2, 3, 4, 5, 3, 6, 4, 5]`
+  - 所以这里需要整一个全局变量`res`，记录`dp`数组的最大值，才是问题的解
+
+- 状态转移
+
+  - 对于给定的`i`，遍历所有比他小的`j`
+  - 如果`nums[i] > nums[j]`，更新`dp[i] = max(dp[i], dp[j]+1)`
+
+- 边界条件
+
+  - 初始化`dp`的时候，元素全为1
+
+  - 指如果这个元素自己形成一个长度为1的严格递增子序列
+
+    ## 题解
+
+```python
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        res = 1
+        dp = [1] * len(nums)
+        for i in range(1, len(nums)):
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    dp[i] = max(dp[i], dp[j]+1)
+            res = max(res, dp[i])
+        return res
+```
+
+# 1143. [ Longest Common Subsequence (Medium)](https://leetcode.cn/problems/longest-common-subsequence/)
+
+## 题意
+
+- 给定两个字符串`text1`和`text2`，返回二者的最长共同子序列
+
+- 同上一题，子序列(subsequence)不要求连续
+
+  ## 示例
+
+  ```python
+  Input: text1 = "abcde", text2 = "ace" 
+  Output: 3  
+  Explanation: The longest common subsequence is "ace" and its length is 3.
+  ```
+
+  ## 思路
+
+- 定义：`dp[i+1][j+1]`表示到第一个字符串的第`i`个位置为止，以及第二个字符串的第`j`个字符串为止的最长公共子序列的长度。
+
+- 转移方程：
+
+  <img src="https://pic.leetcode-cn.com/1617411822-KhEKGw-image.png" alt="image.png" style="zoom: 33%;" />
+
+  - 当`text1[i] = text2[j]`成立时，也就是找到了一个公共子序列增加1个的点，此时有
+
+    `dp[i][j] = dp[i][j-1] + 1 = dp[i-1][j] + 1 = dp[i-1][j-1] + 1`
+
+  - 当`text1[i] = text2[j]`不满足时，`dp[i][j]`继承之前的最大值
+
+- 边界条件：`dp[0][0] = 0`
+
+- **<font color=red>注意这个地方有个坑</font>**
+
+  - 在initialize数组`dp`的时候，要用`[[0] * (n + 1) for _ in range(m + 1)]`
+  - 而不能用`dp = [[0] * (n + 1)] * (m + 1)`
+  - 因为Python建立二维数组使用的浅copy，实际上所有行共享同一个指针
+  - 如果用`dp = [[0] * (n + 1)] * (m + 1)`的话，改变某一行的某一个元素，其他行的元素也会变！
+  - 这是个大坑，以后都得用`[[0] * (n + 1) for _ in range(m + 1)]`的方式建立二维数组
+  
+  ## 题解
+  
+  ```python
+  class Solution(object):
+      def longestCommonSubsequence(self, text1, text2):
+  
+          m, n = len(text1), len(text2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+          
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if text1[i - 1] == text2[j - 1]:
+                      dp[i][j] = dp[i - 1][j - 1] + 1
+                  else:
+                      dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+          
+          return dp[m][n]
+  ```
+  
+  
 
 
 
