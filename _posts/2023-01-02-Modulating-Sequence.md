@@ -60,7 +60,7 @@ render_with_liquid: false
 
   4. 按三度转移，每一个音组都是**前一音组的**一级关系调，如`C-e-G-b`
 
-  <img src="https://user-images.githubusercontent.com/84035000/210292039-b095827e-8b98-4517-a3ee-9195f709157f.png" alt="image" style="zoom:150%;" />
+     <img src="https://user-images.githubusercontent.com/84035000/210292039-b095827e-8b98-4517-a3ee-9195f709157f.png" alt="image" style="zoom:150%;" />
 
   5. 按三度转移，并构成循环，如`C-bE-bG-A-C`或者`C-A-bG-bE-C`
 
