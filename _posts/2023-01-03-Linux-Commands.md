@@ -1,12 +1,12 @@
 ---
-title: 常用 Linux 指令合辑
+title: 常用 Linux 指令合集
 date: 2023-01-03 22:11:00 +0800
 categories: [Backend]
 tags: [Linux, Command]
 render_with_liquid: false
 ---
 
-练习命令行的[网站](https://cmdchallenge.com/)
+练习命令行的[网站传送门](https://cmdchallenge.com/)
 
 # 1 pwd (print working directory)
 
@@ -19,7 +19,7 @@ render_with_liquid: false
 - **ls -R** : 若目录下有文件，则以下之文件亦皆依序列出
 - **ls -a** : 显示隐藏文件
 - **ls -l** : 除文件名称外，将文件型态、权限、拥有者、文件大小等资讯详细列出
-- **ls -lh**: 跟-l的格式差不多，但是文件大小表示方法用B、K、G等表示，更加清晰
+- **ls -lh**: 跟-l的格式差不多，但是文件大小表示方法用B、K、G等表示，更加清晰（h-human）
 
 <img src="https://user-images.githubusercontent.com/84035000/210376176-cec061a1-abba-473f-bc7a-221f6abf2ecf.png" alt="image" style="zoom:50%;" />
 
@@ -186,13 +186,9 @@ P.S.
 
 Linux/Unix 的文件调用权限分为三级 : 文件所有者（Owner）、用户组（Group）、其它用户（Other Users）。
 
-<img src="https://www.runoob.com/wp-content/uploads/2014/08/file-permissions-rwx.jpg" alt="img" style="zoom:50%;" />
-
 只有文件所有者和超级用户可以修改文件或目录的权限。
 
 可以使用绝对模式（八进制数字模式），符号模式指定文件的权限。
-
-<img src="https://www.runoob.com/wp-content/uploads/2014/08/rwx-standard-unix-permission-bits.png" alt="img" style="zoom:75%;" />
 
 ## # 符号模式
 
@@ -215,6 +211,10 @@ chmod u+x ex1.py       # 为 ex1.py 文件拥有者增加可执行权限
 - "=" 设置指定用户权限的设置，即将用户类型的所有权限重新设置
 - r读，w写，x执行
 
+图像记忆：
+
+<img src="https://www.runoob.com/wp-content/uploads/2014/08/file-permissions-rwx.jpg" alt="img" style="zoom:50%;" />
+
 
 
 ## # 八进制数字模式
@@ -225,7 +225,7 @@ example：
 chmod 777 file # 将目前目录下的所有文件与子目录皆设为任何人可读、写、执行
 ```
 
-
+数字的含义：
 
 | #    | 权限           | rwx  | 二进制 |
 | :--- | :------------- | :--- | :----- |
@@ -237,4 +237,53 @@ chmod 777 file # 将目前目录下的所有文件与子目录皆设为任何人
 | 2    | 只写           | -w-  | 010    |
 | 1    | 只执行         | --x  | 001    |
 | 0    | 无             | ---  | 000    |
+
+可以用下面这个图来记忆：
+
+<img src="https://www.runoob.com/wp-content/uploads/2014/08/rwx-standard-unix-permission-bits.png" alt="img" style="zoom:75%;" />
+
+
+
+# 11 chown (change owner)
+
+用于设置文件所有者和文件关联组， 需要超级用户 root 的权限才能执行。
+
+参数：
+
+- -R : 处理指定目录以及其子目录下的所有文件
+- -v : 显示详细的处理信息
+- -f : 忽略错误信息
+- -c : 显示更改的部分的信息
+
+语法：
+
+```bash
+chown [-cfhvR] [--help] [--version] user[:group] file...
+```
+
+- user : 新的文件拥有者的使用者 ID
+- group : 新的文件拥有者的使用者组(group)
+
+用法举例：
+
+|                指令                |                            含义                            |
+| :--------------------------------: | :--------------------------------------------------------: |
+|   chown root /var/run/httpd.pid    |          把 /var/run/httpd.pid 的所有者设置 root           |
+| chown runoob:runoobgroup file1.txt | 将文件 file1.txt 的拥有者设为 runoob，所属群体 runoobgroup |
+|   chown -R runoob:runoobgroup *    |   将当前前目录下的所有文件与子目录的拥有者皆设为 runoob    |
+|      chown :512 /home/runoob       |      把 /home/runoob 的关联组设置为 512，不改变所有者      |
+
+
+
+# 12 kill
+
+用于删除执行中的程序或工作
+
+
+
+
+
+
+
+
 
