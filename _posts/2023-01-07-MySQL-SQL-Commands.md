@@ -18,7 +18,7 @@ Tutorial From [w3schools](https://www.w3schools.com/MySQL/)
 
 ## Sytax
 
-```mysql
+```sql
 SELECT (DISTINCT) column1, column2, ... 
 FROM table_name;
 ```
@@ -33,7 +33,7 @@ FROM table_name;
 
 ## 进阶用法
 
-```mysql
+```sql
 SELECT COUNT(DISTINCT Country) FROM Customers;
 ```
 
@@ -51,7 +51,7 @@ SELECT COUNT(DISTINCT Country) FROM Customers;
 
 ## Syntax
 
-```mysql
+```sql
 SELECT coloumn1, column2, ...
 FROM table_name
 WHERE condition;
@@ -82,21 +82,21 @@ WHERE condition;
 
 - Select all the customers from "Mexico":
 
-  ```mysql
+  ```sql
   SELECT * FROM Custormers
   WHERE City = "Mexico";
   ```
 
 -  Select all fields from "Customers" where country is "Germany" AND city is "Berlin":
 
-  ```mysql
+  ```sql
   SELECT * from Custormers
   WHERE country = "Germany" AND city = "Berlin";
   ```
 
 - Select all fields from "Customers" where country is NOT "Germany" and NOT "USA":
 
-  ```mysql
+  ```sql
   SELECT * from Customers
   WHERE NOT country = "Germany" and NOT "USA";
   ```
@@ -109,7 +109,7 @@ WHERE condition;
 
 ## Syntax
 
-```mysql
+```sql
 SELECT column1, column2, ...
 FROM table_name
 ORDER BY column_A, column_B, ... ASC | DESC;
@@ -119,7 +119,7 @@ ORDER BY column_A, column_B, ... ASC | DESC;
 
 - select all customers from the "Customers" table, sorted DESCENDING by the "Country" column:
 
-  ```mysql
+  ```sql
   SELECT * From Customers 
   ORDER BY Country DESC;
   ```
@@ -128,7 +128,7 @@ ORDER BY column_A, column_B, ... ASC | DESC;
 
   （先按照国家排序，如果国家相同，则按照顾客的姓名降序排列）
 
-  ```mysql
+  ```sql
   SELECT * From Customers 
   ORDER BY Country ASC, CustomerName DESC;
   ```
