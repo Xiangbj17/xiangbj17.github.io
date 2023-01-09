@@ -143,14 +143,14 @@ ORDER BY column_A, column_B, ... ASC | DESC;
 
 ## Syntax
 
-```mysql
+```sql
 INSERT INTO table_name (column1, column2, ...)
 VALUES (value1, value2, ...);
 ```
 
 ## Example
 
-```mysql
+```sql
 INSERT INTO Customers (CustomerName, City, Country)
 VALUES ('Cardinal', 'Stavanger', 'Norway');
 ```
@@ -167,7 +167,7 @@ NULL Value的意思就是没有赋值，NULL不能通过`=,<,>`这写比较操�
 
 - list all customers with a NULL value in the "Address" field:
 
-  ```mysql
+  ```sql
   SELECT * FROM Customers
   WHERE Address IS NULL;
   ```
@@ -180,7 +180,7 @@ NULL Value的意思就是没有赋值，NULL不能通过`=,<,>`这写比较操�
 
 ## Syntax
 
-```mysql
+```sql
 UPDATE table_name
 SET column1 = value1, column2 = value2, ...
 WHERE condition;
@@ -190,7 +190,7 @@ WHERE condition;
 
 - update the PostalCode to 00000 for all records where country is "Mexico":
 
-  ```mysql
+  ```sql
   UPDATE Customers
   SET PostalCode = 00000
   WHERE Country = 'Mexico';
@@ -198,7 +198,7 @@ WHERE condition;
 
 - Update the `City` column as 'Oslo' of all records in the `Customers` table:
 
-  ```mysql
+  ```sql
   UPDATE Customers
   SET City = 'Oslo';
   ```
@@ -211,7 +211,7 @@ WHERE condition;
 
 ## Syntax
 
-```mysql
+```sql
 DELETE FROM table_name WHERE condition;
 ```
 
@@ -219,7 +219,7 @@ DELETE FROM table_name WHERE condition;
 
 - delete the customer "SLS" from the "Customers" table:
 
-  ```mysql
+  ```sql
   DELETE FROM Customers WHERE CustomerName = 'SLS'
   ```
 
@@ -229,7 +229,7 @@ DELETE FROM table_name WHERE condition;
 
 ## Syntax
 
-```mysql
+```sql
 SELECT column_names(s) FROM table_name
 WHERE conditions LIMIT number;
 ```
@@ -242,13 +242,128 @@ WHERE conditions LIMIT number;
 
 ## Syntax
 
-```mysql
+```sql
 SELECT MIN(column_name) FROM table_name WHERE condition;
 ```
 
 
 
+# 10 LIKE
+
+用于匹配一些特定的pattern，像Python的正则表达式。记住句法和两个通配符即可。
+
+## Syntax
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE columN LIKE pattern;
+```
+
+## Wildcards
+
+- `%` : 可以表示零个，一个或者多个字符
+- `_` : 表示一个字符
+
+## Example
+
+| LIKE Operator                  | Description                                                  |
+| :----------------------------- | :----------------------------------------------------------- |
+| WHERE CustomerName LIKE 'a%'   | Finds any values that start with "a"                         |
+| WHERE CustomerName LIKE '%a'   | Finds any values that end with "a"                           |
+| WHERE CustomerName LIKE '%or%' | Finds any values that have "or" in any position              |
+| WHERE CustomerName LIKE '_r%'  | Finds any values that have "r" in the second position        |
+| WHERE CustomerName LIKE 'a_%'  | Finds any values that start with "a" and are at least 2 characters in length |
+| WHERE CustomerName LIKE 'a__%' | Finds any values that start with "a" and are at least 3 characters in length |
+| WHERE ContactName LIKE 'a%o'   | Finds any values that start with "a" and ends with "o"       |
 
 
 
+# 11 IN, BETWEEN AND
+
+## IN Syntax
+
+IN配合WHERE使用，跟Python的in用法差不多。
+
+```sql
+SELECT column1, column2, ... FROM table_name
+WHERE column_name IN (value1, value2, ...);
+```
+
+## BETWEEN Syntax
+
+也是配合WHERE使用，用于挑选在一定范围内的数据，比如数字，字符，日期。
+
+```sql
+SELECT column_name(s) FROM table_name
+WHERE column_name BETWEEN value1 AND value2;
+```
+
+# 12 JOINs
+
+用于合并多个表的行。
+
+## Example
+
+假设有一个 "Websites" table:
+
+```
++----+--------------+---------------------------+-------+---------+
+| id | name         | url                       | alexa | country |
++----+--------------+---------------------------+-------+---------+
+| 1  | Google       | https://www.google.cm/    | 1     | USA     |
+| 2  | 淘宝          | https://www.taobao.com/   | 13    | CN      |
+| 3  | 菜鸟教程      | http://www.runoob.com/    | 4689  | CN      |
+| 4  | 微博          | http://weibo.com/         | 20    | CN      |
+| 5  | Facebook     | https://www.facebook.com/ | 3     | USA     |
+| 7  | stackoverflow | http://stackoverflow.com/ |   0 | IND     |
++----+---------------+---------------------------+-------+---------+
+```
+
+另外，还有一个 "access_log" table 网站访问记录:
+
+```
++-----+---------+-------+------------+
+| id  | site_id | count | date       |
++-----+---------+-------+------------+
+|   1 |       1 |    45 | 2016-05-10 |
+|   2 |       3 |   100 | 2016-05-13 |
+|   3 |       1 |   230 | 2016-05-14 |
+|   4 |       2 |    10 | 2016-05-14 |
+|   5 |       5 |   205 | 2016-05-14 |
+|   6 |       4 |    13 | 2016-05-15 |
+|   7 |       3 |   220 | 2016-05-15 |
+|   8 |       5 |   545 | 2016-05-16 |
+|   9 |       3 |   201 | 2016-05-17 |
++-----+---------+-------+------------+
+```
+
+返回所有网站的访问记录，并以浏览次数排序：
+
+```sql
+SELECT Websites.name, access_log.count, access_log.date
+FROM Websites
+INNER JOIN access_log
+ON Websites.id = access_log.site_id
+ORDER BY access_log.count;
+```
+
+上面的指令的结果：
+
+<img src="https://user-images.githubusercontent.com/84035000/211337948-192fa11c-f9fc-43a0-8cb2-2670575e5559.png" alt="image" style="zoom:50%;" />
+
+## Supported Type
+
+- `INNER JOIN`: selects all rows from both tables as long as there is a match between the columns.
+- `LEFT JOIN`: 从左表（Websites）返回所有的行，即使右表（access_log）中没有匹配。
+- `RIGHT JOIN`: 从右表（access_log）返回所有的行，即使左表（Websites）中没有匹配。
+- `CROSS JOIN`:
+
+![image](https://user-images.githubusercontent.com/84035000/211335518-6f2772cc-d508-4fd0-91e0-78806e1a089e.png)
+
+
+
+| LEFT JOIN                                                    | RIGHT JOIN                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img src="https://www.runoob.com/wp-content/uploads/2013/09/left-join1.jpg" alt="img" style="zoom:50%;" /> | ![img](https://www.runoob.com/wp-content/uploads/2013/09/402A662D-3553-449C-B980-942D864412BD.jpg) |
 
