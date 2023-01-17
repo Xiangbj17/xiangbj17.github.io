@@ -367,3 +367,122 @@ ORDER BY access_log.count;
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | <img src="https://www.runoob.com/wp-content/uploads/2013/09/left-join1.jpg" alt="img" style="zoom:50%;" /> | ![img](https://www.runoob.com/wp-content/uploads/2013/09/402A662D-3553-449C-B980-942D864412BD.jpg) |
 
+
+
+# 13 UNION
+
+用于连接多个SELECT返回的result-set，条件：
+
+- 每个result-set必须有相同的column数量
+- column必须有相似的数据类型
+- 每个result-set的column必须有相同的顺序
+
+## Syntax
+
+```sql
+SELECT column_name(s) from table_1
+UNION
+SELECT column_name(s) from table_2;
+```
+
+##  NOTE: UNION ALL
+
+`UNION`只会选择不同的值，如果要允许重复的值，使用`UNION ALL`
+
+## Example
+
+```sql
+# 常规用法
+SELECT City FROM Customers
+UNION
+SELECT City FROM Suppliers
+ORDER BY City;
+
+# 搭配 WHERE 使用
+SELECT City, Country FROM Customers
+WHERE Country='Germany'
+UNION
+SELECT City, Country FROM Suppliers
+WHERE Country='Germany'
+ORDER BY City;
+```
+
+
+
+# 14 GROUP BY
+
+用于统计某一列相同值的个数，通常会搭配Aggregate Function使用，比如`MEAN(), AVG(), MAX()...`
+
+## Syntax
+
+```sql
+SELECT column_names(s) FROM table_name WHERE condition
+GROUP BY column_name(s)
+ORDER BY column_names(s)；
+```
+
+## Example
+
+```sql
+# 统计每个城市有多少人
+SELECT COUNT(CustomerID), Country FROM Customers
+GROUP BY Country
+ORDER BY COUNT(CustomerID) DESC;
+```
+
+<img src="https://user-images.githubusercontent.com/84035000/211463740-7292c766-6088-4168-bea4-f11a86112b99.png" alt="image" style="zoom:67%;" />
+
+# 15 HAVING
+
+`HAVING`字句可以和Aggregate Function配合使用，弥补了`WHERE`的不足。
+
+## Syntax
+
+```sql
+SELECT column_names(s) FROM table_name
+WHERE condition GROUP BY column_name(s)
+HAVING condition ORDER BY column_name(s);
+```
+
+## Example
+
+- list the **number of customers** in each country. Only include countries with more than 5 customers:
+
+```sql
+SELECT COUNT(CustomerID), Country From Customers
+GROUP BY Country 
+HAVING COUNT(CustomerID) > 5;
+```
+
+# 16 EXISTS
+
+用于判断subquery是否存在record
+
+## Syntax
+
+```sql
+SELECT column_name(s) FROM table_name
+WHERE EXISTS (SELECT column_name FROM table_name WHERE condition)
+```
+
+## Example
+
+```sql
+# 查询Product的价格小于20的Suppliers
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
