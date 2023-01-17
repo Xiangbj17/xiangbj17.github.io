@@ -100,5 +100,111 @@ where salary < (select max(salary) from employee);
 
 
 
-# 177. 第N高的薪水（中等）
+# 182. 查找重复的电子邮箱(简单)
+
+## 题目
+
+```
+Person 表：
++----+---------+
+| Id | Email   |
++----+---------+
+| 1  | a@b.com |
+| 2  | c@d.com |
+| 3  | a@b.com |
++----+---------+
+
+```
+
+编写一个 SQL 查询，查找 `Person` 表中所有重复的电子邮箱。
+
+## 分析
+
+- 重复的话，就是`count(email)>1`
+- 由于count是Aggregation Function，得搭配`having`使用
+- `having`是分组过滤条件，需要和`group by`（分组）联用，所以还需要分组
+
+## 题解
+
+```sql
+select email from person
+group by email having count(email) > 1;
+```
+
+
+
+# 183. 从不订购的客户(简单)
+
+## 题目
+
+某网站包含两个表，`Customers` 表和 `Orders` 表
+
+```
+Customers 表：
++----+-------+
+| Id | Name  |
++----+-------+
+| 1  | Joe   |
+| 2  | Henry |
+| 3  | Sam   |
+| 4  | Max   |
++----+-------+
+
+Orders 表：
++----+------------+
+| Id | CustomerId |
++----+------------+
+| 1  | 3          |
+| 2  | 1          |
++----+------------+
+```
+
+编写一个 SQL 查询，找出所有从不订购任何东西的客户。
+
+## 分析
+
+- 先从Order里面把买过的CustomerId都找出来
+- Customer表里面的那些Id不在上述result里的Name，就是要求的不买的人
+
+## 解答
+
+```sql
+select name as Customers from Customers
+where Id not in 
+(select CustomerId from Orders);
+```
+
+
+
+# 196. 删除重复的电子邮箱 (简单)
+
+## 题目
+
+```
+表 Person
++----+------------------+
+| id | email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+| 3  | john@example.com |
++----+------------------+
+id是该表的主键列。
+该表的每一行包含一封电子邮件。电子邮件将不包含大写字母。
+
+```
+
+编写一个 SQL **删除语句**来 **删除** 所有重复的电子邮件，只保留一个id最小的唯一电子邮件。
+
+## 分析
+
+- 令p1表示Person这个表，假设有和Person一模一样的一个表，称为p2
+- 那些`p1.email = p2.email`且`p1.id > p2.id`的部分，就是要删除的部分
+
+## 题解
+
+```sql
+delete p1 from person p1, person p2
+where p1.email = p2.email and p1.id > p2.id;
+```
 
