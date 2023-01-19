@@ -316,3 +316,218 @@ class Solution(object):
         return res[-1][-1][-1]
 ```
 
+
+
+# 322. [coin change (Medium)](https://leetcode.cn/problems/coin-change/)
+
+## 题目
+
+- 一个整数数组`coins`，里面存了一些不同面额的硬币，每种面额的硬币有无限个（可以重复使用）
+- 返回能凑成金额`amount`的最少的硬币个数。如果凑不成，返回-1.
+
+## Example
+
+```python
+# Example 1
+coins = [1, 2, 5]
+amount = 11
+res = 3 	# 11 = 5 + 5 + 1
+
+# Example 2
+coins = [1]
+amount = 0
+res = 0
+```
+
+## 分析
+
+首先，这个如果还沿用0/1背包的二维方式，不太现实了。因为硬币无限，那么第一个维度将会是无穷。
+
+那么，就只能砍掉第一个维度，保留第二个维度。
+
+我们假设`dp[i]`表示：当前的硬币凑成面额`i`最少需要多少个硬币。用上面的例子，可以完成这个表：
+
+| i     | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | 10   | 11   |
+| ----- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| dp[i] | 0    | 1    | 1    | 2    | 2    | 1    | 2    | 2    | 3    | 3    | 2    | 3    |
+
+在填写上面这个表的过程中，可以发现规律：
+
+`dp[i] = min{dp[i-k]+1} for k in coins`
+
+边界条件就是`dp[0] = 0`，而且在初始化的时候，除了`dp[0]`之外的值都得初始化为-1
+
+## 题解
+
+```python
+class Solution(object):
+    def coinChange(self, coins, amount):
+      	# 初始化dp
+        dp = [0] + [-1] * amount
+        for c in coins:
+            if c <= amount:
+                dp[c] = 1
+
+        for i in range(1, len(dp)):
+            if dp[i] != -1:
+                continue # 说明前面initial的时候已经计算过
+            temp_min = float("inf")
+            for coin in coins:
+              	# 注意这个地方: for coin， 不要 for j in range(i)，会超时
+                if 0 <= i-coin <len(dp):
+                    if dp[i-coin] != -1:
+                        temp_min = min(temp_min, dp[i-coin]+1)
+            if temp_min < float("inf") and temp_min != -1:
+                dp[i] = temp_min
+        return dp[-1]
+```
+
+
+
+# 字符串编辑
+
+# 72. [Edit Distance (Hard)](https://leetcode.cn/problems/edit-distance/)
+
+## 题目
+
+给定两个单词`word1`和`word2`，返回将前者转换成后者需要的最少操作
+
+操作一共有三种：1. 插入一个字符；2. 删除一个字符；3. 替换一个字符
+
+## Example
+
+```python
+word1 = "horse"
+word2 = "ros"
+res = 3 
+# horse -> rorse -> rose -> ros
+```
+
+## 思路
+
+二维动态规划，`dp[i][j]`表示从`word1[i]`到`word2[j]`最少需要多少步，可以先把**边界条件**列出来，如下表所示：
+
+| `dp` | j         | 0         | 1          | 2          | 3          |
+| ---- | --------- | --------- | ---------- | ---------- | ---------- |
+| i    |           | <u>''</u> | <u>r</u>   | <u>o</u>   | <u>s</u>   |
+| 0    | <u>''</u> | 0         | 1          | 2          | 3          |
+| 1    | <u>h</u>  | 1         | `dp[1][1]` | `dp[1][2]` | `dp[1][3]` |
+| 2    | <u>o</u>  | 2         |            |            |            |
+| 3    | <u>r</u>  | 3         |            |            |            |
+| 4    | <u>s</u>  | 4         |            |            |            |
+| 5    | <u>e</u>  | 5         |            |            |            |
+
+剩下来的部分怎么填：
+
+- `dp[1][1]`
+  - 当我们考虑`i=1, j=1`的情况时，两个字符串新加进来的字符分别是`word1[1]=h`和`word2[1]=r`，不相等
+  - 在考虑它和上，左，左上表格中的数的联系。
+    - `dp[1][1]`和`dp[0][1]`分别是`h->r`和`""->r`
+      - 我们可以先删掉`h`，将`word1`变成空字符串，然后就变成`dp[0][1]`的情况，那么有：
+      - `dp[1][1] <= dp[0][1] + 1 = 1 + 1 = 2`
+    - `dp[1][1]`和`dp[1][0]`分别是`h->r`和`h->""`
+      - 相对于`h->""`的情况，我们可以添加一个字符`r`，实现` h -> "" -> r`，于是：
+      - `dp[1][1] <= dp[1][0] +1 = 2`
+    - `dp[1][1]`和`dp[0][0]`分别是`h->r`和`""->""`
+      - 在后者的基础上，字符串尾部加入了两个不等的字符，只需要一次替换即可实现，那么：
+      - `dp[1][1] <= dp[0][0] +1 = 1`
+  - 所以`dp[1][1] = 1`
+
+根据上面的思考方式，对于任意的`dp[i][j]`，我们先比较`word1[i]`是否等于`word2[j]`
+
+- 相等
+  - `dp[i][j] = dp[i-1][j-1] + 1`
+- 不等
+  - `dp[i][j] = min{dp[i-1][j-1], dp[i-1][j], dp[i][j-1]} + 1`
+
+## 题解
+
+```python
+"""执行用时：104ms, 79.50%; 内存消耗：16.1MB, 94.53%"""
+class Solution(object):
+    def minDistance(self, word1, word2):
+        # 初始化二维动态规划数组res,[[0,1,2,3,4,5],[1,1,1,1,1,1],[2,2,2,2,2,2],[3,3,3,3,3,3]]
+        res = [[i for i in range(len(word2)+1)]] + [[j+1]*(len(word2)+1) for j in range(len(word1))]
+
+        for i in range(1, len(res)):
+            for j in range(1, len(res[0])):
+                if word1[i-1] == word2[j-1]:
+                    res[i][j] = res[i-1][j-1]
+                else:
+                    res[i][j] = min(res[i-1][j-1], res[i-1][j], res[i][j-1])+1
+
+        return res[-1][-1]
+```
+
+# 650. [Two Keys Keyboard (Meduim)](https://leetcode.cn/problems/2-keys-keyboard/)
+
+## 题目
+
+- 只有一个copy和一个paste键
+- 记事本上最初有一个`'A'`，求最少经过多少次操作，能恰好得到n个`'A'`
+
+## Example
+
+```python
+# Example1
+input = 3
+res = 3  # copy 'A'， paste 两次，得到 'AAA'
+
+# Example 2
+input = 1
+res = 0
+```
+
+## 思路
+
+如果只用一个维度，没办法记录当前clipboard上面的数值，所以应该得用二维动态规划。
+
+记`dp[i][j]`表示当需要得到`i`个A，剪贴板上有`j`个A的时候，最小的操作次数。
+
+一个合法`[i][j]`对，必须满足`i >= j`，我们先列一个表分析一下`i<=8`的情况，这个表应该只有一半有数值
+
+| `clipboard` \ `i` | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    |
+| ----------------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| 1                 | 1    | 2    | 3    | 4    |      |      |      |      |
+| 2                 |      | 3    | -    | 4    |      |      |      |      |
+| 3                 |      |      | 4    | -    |      |      |      |      |
+| 4                 |      |      |      | 5    |      |      |      |      |
+| 5                 |      |      |      |      |      |      |      |      |
+| 6                 |      |      |      |      |      |      |      |      |
+| 7                 |      |      |      |      |      |      |      |      |
+| 8                 |      |      |      |      |      |      |      |      |
+
+填表的时候，可以发现：
+
+- 边界条件是`dp[1][1] = 1`
+- 状态转移方程怎么考虑？从允许的操作去想。一次操作，要么进行粘贴，要么复制当前的数字。
+  - 如果当前进行粘贴，剪贴版的数字不变，A的字符数量变化，那么：
+    - 从这一分析可以得到`dp[i][j]`和前一行`dp[i-k][j]`的关系
+    - 如果`j + k = 1`，从`(i-k, j)`状态出发，剪贴一次可以得到`i`，故有
+    - <font color=green>`dp[i][j] = dp[i-k][j] if (j + k  == i)`</font>
+  - 如果当前进行复制，那么剪贴板的数字变化，A的字符数量不变
+    - 从这一分析可以得到`dp[i][j]`和`dp[i][i]`的关系为：
+    - <font color=green>`dp[i][i] = min{dp[i][k]} + 1`</font>
+
+- 如果最后要求的是`i`个A，就在`dp[i][*]`中取最小者作为解
+
+## 题解
+
+```python
+class Solution(object):
+    def minSteps(self, n):
+        if n == 1:
+            return 0
+        res = [[-1]*n for i in range(n)] # 创建
+        res[0][0] = 1
+        for i in range(1, len(res)):
+            # 搜相同的clipboard
+            temp_min = float("inf")
+            for j in range(i):
+                if res[i-j-1][j] != -1:
+                    res[i][j] = res[i-j-1][j] + 1
+                    temp_min = min(res[i][j], temp_min)
+            res[i][i] = temp_min + 1
+        return temp_min
+```
+
