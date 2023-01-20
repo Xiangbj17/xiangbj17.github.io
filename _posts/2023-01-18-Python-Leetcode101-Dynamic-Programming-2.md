@@ -531,3 +531,185 @@ class Solution(object):
         return temp_min
 ```
 
+## 第二种方法（加入数学的考虑）
+
+这个问题的解可以压缩到一维数组，如果把里面的数学逻辑捋清楚。
+
+我们记`f[i]`表示有`i`个A的最小操作次数，稍微想一下，可以知道：
+
+- `f[2i] = f[i] + 2`：如果已经有了`i`个A，再复制一次，粘贴一次，就能变成`2i`个A
+- `f[x] = x`，对于质数来说，除了复制一次，粘贴`x-1`次，别无它法。
+
+如果有一个合数`p`，它恰好可以分解成两个质数`p = m * n`，那么有：
+
+- `f[p] = f[m] + f[n]`：首先我们操作`f[m]`次，拥有`m`个A，然后复制一次，粘贴`(n-1)`次，即可拥有`m * n`个A
+- 而且因为`m, n`都是质数，有：`f[m]= m, f[n] = n`
+- 故有`f[p] = m + n`
+
+进一步，如果他可以分解成`p = p1^r1 * p2^r2 * p3^r3 ...`，其中`pi`均为质数，那么有：
+
+- `f[p] = f[p1] * r1 + f[p2] * r2 + f[p3] * r3 + ... = p1*r1 + p2*r2 + p3*r3 + ...`
+
+所以，<font color=green>对 n 做**质因数分解**，并将所有质因数乘以它的幂次并相加即可.</font>
+
+那么，可以总结出来动态规划的规律。
+
+不失一般性地，对于任意的整数`i > 1`，`f[i] = f[j] + f[i/j] (if i % j ==0)`
+
+```python
+class Solution(object):
+    def minSteps(self, n):
+        if n == 1:
+            return 0
+        temp = n
+        res =  0                                                            
+        for j in range(2, n+1):
+            while temp % j == 0:
+                res += j
+                temp = temp / j
+            if temp == 1:
+                break
+        return res
+```
+
+## 结果比较
+
+<img src="https://user-images.githubusercontent.com/84035000/213613409-ed38b538-90fc-4f26-b61a-121b42b0bbc2.png" alt="image" style="zoom:50%;" />
+
+
+
+# 10. [Regular Expression Matching (Hard)](https://leetcode.cn/problems/regular-expression-matching/)
+
+## 题目
+
+- 假设一种正则匹配规则：`.`匹配任意单个字符；`*`匹配零个或者多个前面的那一元素
+- 给定一个字符串`s`和字符串**规律**`p`，返回能否将`s`匹配到`p`
+
+## Example
+
+```python
+# Input: 
+s = "aab", p = "c*a*b"
+# Output:
+res = True
+```
+
+## 思路
+
+乍一看我感觉这个题不配Hard，但是仔细一想`. & *`的功能，其实还挺麻烦的，比如：
+
+- `"a*"`可以表示`" ", "a", "aa", "aaa...."` 
+- `"c*a*b"`可以表示`"b", "cb", 'ab', 'aaaab', 'cccaaab'`
+- `".*"`表示的东西更多，能表示任何字符，或者没有字符
+
+字符串匹配问题，通用方法还是得动态规划来，下面考虑怎么设计状态，状态转移方程，怎么找边界条件。
+
+老规矩，还是先拿Example开刀。
+
+题目中有两个`input`，一个`s`，一个`p`，比较符合二维动态规划，先用二维试试。
+
+|            | `p[j]` | 0    | 1    | 2    | 3    | 4    | 5    |
+| ---------- | ------ | ---- | ---- | ---- | ---- | ---- | ---- |
+| **`s[i]`** |        | ""   | c    | *    | a    | *    | b    |
+| 0          | ""     | √    | x    | √    | x    | √    | x    |
+| 1          | a      | x    |      |      |      |      |      |
+| 2          | a      | x    |      |      |      |      |      |
+| 3          | b      | x    |      |      |      |      |      |
+
+上面的表列出来边界条件`dp[0][0]`，以及按照个人感觉填出来的第一行第一列。
+
+下面考虑如何去填充后一行。
+
+- `dp[1][1], s = 'a', p = 'c'`
+  - 新增的字符`s[1] = 'a'`，通配符是`p[1] = 'c'`
+  - 两个新增的字符不一样，那么`dp[1][1] = False`
+- `dp[1][2], s = 'a', p = 'c*'`
+  - 新增的字符`s[1] = 'a'`，通配符是`p[2] = '*'`
+  - 新增的字符还是不一样，`dp[1][2] = False`
+- `dp[1][3], s = 'a', p = 'c*a'`
+  - 新增的字符都是`a`，这时候可以追溯一下前面的情况
+  - 发现`dp[0][2]`是`True`，那么`dp[1][3]`也是`True`
+- `dp[1][4], s = 'a', p = 'c*a*'`
+  - 新增的通配符是`p[4] = '*'`，这种情况如果上面一个是`True`，它应该也是`True`
+  - 发现`dp[0][4]`是`True`，那么`dp[1][4]`也是`True`
+
+根据上面的分析，填好第一行
+
+|            | `p[j]` | 0    | 1    | 2    | 3    | 4    | 5    |
+| ---------- | ------ | ---- | ---- | ---- | ---- | ---- | ---- |
+| **`s[i]`** |        | ""   | c    | *    | a    | *    | b    |
+| 0          | ""     | √    | x    | √    | x    | √    | x    |
+| 1          | a      | x    | F    | F    | T    | T    | F    |
+| 2          | a      | x    |      |      |      |      |      |
+| 3          | b      | x    |      |      |      |      |      |
+
+根据上面一行的填写过程，总结一下规律，对于任意的`(i, j)`：
+
+- 如果`s[i] == p[j]`
+
+  - `dp[i][j] == dp[i-1][j-1]`
+
+- 如果`s[i] != p[j]`
+
+  - 若`p[j] == '*'`，说明`p[j-1]`对应的字符可以出现多次，我们比较`s[i]`和`p[i-1]`的关系
+
+    - 若`s[i] == p[j-1]`
+
+      - `dp[i][j] = dp[i-1][j] or dp[i][j-2]`
+
+      - 解释
+
+        - `(i, j-2)`的情况，表示`x*`这个通配符匹配上了一次【牺牲两个`p`，换一个`s`】
+
+          <img src="https://pic.leetcode-cn.com/1650902423-SwkmFq-LeetCode-10-3.png" alt="LeetCode-10-3.png" style="zoom:25%;" />
+
+        - `(i-1, j)`的话，表示`x*`这个通配符匹配上了二次以上 
+
+        <img src="https://pic.leetcode-cn.com/1650902717-XBZEcp-LeetCode-10-4.png" alt="LeetCode-10-4.png" style="zoom:25%;" />
+
+    - 若`s[i] != p[j-1]`
+
+      - `dp[i][j] = dp[i][j-2]`
+      - 表示这个通配符一次都没匹配上
+
+  - 若`p[j] == '.'`，我们认为`s[i] == p[j]`
+
+    - `dp[i][j] == dp[i-1][j-1]`
+
+## 题解
+
+```python
+class Solution(object):
+    def isMatch(self, s, p):
+        
+        # 开辟保存状态的二维空间
+        res = [[False]*(len(p)+1) for i in range(len(s)+1)]
+        res[0][0] = True  # 边界条件
+
+        # 第 0 行的条件自行讨论
+        for j in range(1, len(res[0])):
+            if p[j-1] == '*':
+                res[0][j] = res[0][j-2]
+
+        # 从第 1 行开始逐列逐行分析
+        for i in range(1, len(res)):
+            for j in range(1, len(res[0])):
+                if p[j-1] == '.' or s[i-1] == p[j-1]:
+                    res[i][j] = res[i-1][j-1]
+                elif p[j-1] == '*':
+                    if p[j-2] == s[i-1] or p[j-2] == '.':
+                        res[i][j] = res[i-1][j] or res[i][j-2]
+                    else:
+                        res[i][j] = res[i][j-2]
+                    
+        return res[-1][-1]
+
+```
+
+## 执行结果
+
+还不错，但是想递归方程着实恼火
+
+<img src="https://user-images.githubusercontent.com/84035000/213655657-212ac959-4c42-492d-8279-672e970e5c80.png" alt="image" style="zoom:50%;" />
+
+# 股票交易类问题
