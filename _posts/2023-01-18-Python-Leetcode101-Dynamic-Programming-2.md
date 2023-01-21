@@ -713,3 +713,147 @@ class Solution(object):
 <img src="https://user-images.githubusercontent.com/84035000/213655657-212ac959-4c42-492d-8279-672e970e5c80.png" alt="image" style="zoom:50%;" />
 
 # 股票交易类问题
+
+# 188. [Best Time to Buy and Sell Stock IV (Hard)](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iv/)
+
+## 题目
+
+- 有一个整数数组`prices`，储存了股票每一天的价格
+- 限制最多进行`k`笔交易，求能够获取的最大利润
+
+## Example
+
+```python
+k = 2, prices = [3, 2, 6, 5, 0, 3]
+res = 7  # 第二天2元买入，第三天6元卖出(赚4元)；倒数第二天0元买入，最后一天3元卖出（赚3块钱）
+```
+
+## 思路
+
+股票交易有贪心做法，但是为了避免贪心最后没办法推导到全局贪心，还是动态规划比较保底。
+
+动态规划的话，得考虑这个问题的子问题有几个维度：
+
+- `prices`数组的长度，也就是天数
+- `k`有多大，也就是最多允许多少笔交易
+- 光靠上面两个维度，难以推导状态转移方程，需要加入第三个维度，当日是否持股
+
+定义`dp[i][j][k]`表示第`i`天，进行了`j`次交易，`k = 0`表示手中没有股票，`k = 1`表示手中有股票时**最大收益**。
+
+状态转移方程：
+
+- 对于任意的`(i, j, 0)`，手中没有股票，有两种情况：前一天有，今天卖掉；或者前一天也没有，今天继续不买
+  - `dp[i][j][0] = max {dp[i-1][j-1][1] + prices[i], dp[i-1][j][0]`} 
+- 对于任意的`(i, j, 1)`，手中有一股，也有两种情况：今天刚买一股；或者前一天买了一股，今天不动
+  - `dp[i][j][1] = max{dp[i-1][j][0] - prices[i], dp[i-1][j][1]}`
+
+边界条件（初始化）：
+
+- 当`i = 0`时的所有情况，也就是第一天的时候：
+  - `dp[i][*][0] = 0`：第一天不买，最大收益为0
+  - `dp[i][*][1] = -prices[0]`：第一天持有股票，最大收益为负的第一天股价
+
+- 当`k = 0`时的所有情况，也就是只有一次买卖的机会：
+  - `dp[*][0][0] = 0`：永远也不买，永远都收益为0
+  - `dp[i][0][1] = max{dp[i-1][0][0] - prices[i], dp[i-1][0][1]}`
+
+
+## 题解
+
+```python
+class Solution(object):
+    def maxProfit(self, k, prices):
+        # 创建状态的存储空间res
+        res = [[[0]*2 for _ in range(k+1)] for _ in range(len(prices))]
+
+        # 初始化第一天的情况
+        for j in range(k+1):
+            res[0][j][0] = 0  # 手中没有持股，也就是没买，那就是0
+            res[0][j][1] = -prices[0] # 手中持股，那就是负的第一天的价格
+
+        # 初始化只允许买卖一次的情况
+        for i in range(1, len(prices)):
+            res[i][0][0] = 0  # 永远不持股，就是0咯
+            res[i][0][1] = max(res[i-1][0][1], res[i-1][0][0] - prices[i])
+
+        # 状态转移
+        for i in range(1, len(prices)):
+            for j in range(1, k+1):
+                res[i][j][0] = max(res[i-1][j-1][1]+prices[i], res[i-1][j][0])
+                res[i][j][1] = max(res[i-1][j][0]-prices[i], res[i-1][j][1])
+                
+        return max(res[-1][-1])
+```
+
+
+
+# 309. [Best Time to Buy and Sell Stock with Cooldown (Medium)](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+## 题目
+
+- 整数数组`prices`包含了某些天的股票价格
+- 约束：卖出股票后，无法在第二天买入（拥有一天的冷冻期）
+- 求最大利润
+
+## Example
+
+```python
+prices = [1, 2, 3, 0, 2]
+res = 3 	# 1买入，2卖出，赚一块；0买入，2卖出，赚两块
+```
+
+## 思路
+
+二维动态规划，用`dp[i][j]`表示
+
+- 第一个维度记录天数
+- 第二个维度有三个状态：持有股票，不持有股票且在非冷冻期，不持有股票且不处于冷冻期
+
+初始化：
+
+| 天数             | 0    | 1    | 2    | 3    | 4    |
+| ---------------- | ---- | ---- | ---- | ---- | ---- |
+| 0持有            | -1   |      |      |      |      |
+| 1不持有&冷冻期   | 0    |      |      |      |      |
+| 2不持有&不在冷冻 | 0    |      |      |      |      |
+
+我们定义「**处于冷冻期**」为：
+
+- 在卖出的当日为处于冷冻期的状态
+- 冷冻期的第二天不能买，但是是通过查询前一天的状态发现自己不能买的
+
+现在考虑第二天`dp[1][[*]`的情况：
+
+- `dp[1][0]`持有股票，说明要么是第一天买了第二天按兵不动，要么是第一天没动第二天买，那么
+  - `dp[1][0] = max{dp[0][0], dp[0][2]-prices[1]}` 
+- `dp[1][1]`不持有，且处于冷冻期，那说明这一天卖掉了
+  - `dp[1][1] = dp[0][0] + prices[1]`
+- `dp[1][2]`不持有，且不处于冷冻期，可能前一天也不持有，今天也没买，这个状态和`(0, 1) & (0, 2)`都有关
+  - `dp[1][2] = max{dp[0][1], dp[0][2]}`
+
+根据这个其实就可以写一个状态转移方程了：
+
+- `dp[i][0] = max{dp[i-1][0], dp[i-1][2]-prices[i]}`
+- `dp[i][1] = dp[i-1][0] + prices[1]`
+- `dp[i][2] = max{dp[i-1][1], dp[i-1][2]}`
+
+## 题解
+
+```python
+class Solution(object):
+    def maxProfit(self, prices):
+        # 创建存储状态的空间res
+        res = [[0]*3 for _ in range(len(prices))]
+
+        # 初始化res[0][0], [0][1], [0][2]
+        res[0] = [-prices[0], 0, 0]
+
+        # 状态转移
+        for i in range(1, len(res)):
+            res[i][0] = max(res[i-1][0], res[i-1][2]-prices[i])
+            res[i][1] = res[i-1][0] + prices[i]
+            res[i][2] = max(res[i-1][1], res[i-1][2])
+
+        return max(res[-1])
+```
+
