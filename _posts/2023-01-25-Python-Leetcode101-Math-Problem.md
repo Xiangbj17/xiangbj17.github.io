@@ -166,4 +166,67 @@ class Solution(object):
 
 # 随机与取样
 
-# 
+# 528. [Random Pick with Weight (Medium)](https://leetcode.cn/problems/random-pick-with-weight/)
+
+## 题目
+
+给定一个正整数数组`w`，其中`w[i]`代表第`i`个下标对应的权重
+
+要求实现一个函数`pickIndex`，可以按照上面的权重随机返回下标
+
+## Example
+
+```python
+# 输入：
+["Solution","pickIndex","pickIndex","pickIndex","pickIndex","pickIndex"]
+[[[1,3]],[],[],[],[],[]]
+
+# 输出：
+[null,1,1,1,1,0]
+
+"""
+解释：
+Solution solution = new Solution([1, 3]);
+solution.pickIndex(); // 返回 1，返回下标 1，返回该下标概率为 3/4 。
+solution.pickIndex(); // 返回 1
+solution.pickIndex(); // 返回 1
+solution.pickIndex(); // 返回 1
+solution.pickIndex(); // 返回 0，返回下标 0，返回该下标概率为 1/4 。
+"""
+```
+
+## 思路
+
+比如有一个数组`w = [1, 2, 3, 4, 5, 6]`
+
+我们先把它变成`accumulate = [1, 3, 6, 10, 15, 21]`
+
+然后使用random.randint在`1~21`随机产生一个整数
+
+比如产生了一个`11`，那我们返回`10`对应的下标，也就是`3`
+
+为了加速，我们使用二分搜索来找这个下标
+
+## 题解
+
+```python
+class Solution(object):
+    def __init__(self, w):
+        self.sum = sum(w)
+        self.lst = [w[0]]
+        for i in range(1, len(w)):
+            self.lst.append(w[i]+self.lst[i-1])
+
+    def pickIndex(self):
+        target = random.randint(1, self.sum)
+        l, r = 0, len(self.lst)
+        while l < r:
+            mid = (l + r) // 2
+            if self.lst[mid] >= target:
+                r = mid
+            else:
+                l = mid + 1
+        return r
+
+```
+
