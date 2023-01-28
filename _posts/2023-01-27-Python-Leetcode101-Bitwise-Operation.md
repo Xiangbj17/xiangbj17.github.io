@@ -255,3 +255,45 @@ class Solution(object):
         return res
 ```
 
+# [338. Counting Bits (Easy)](https://leetcode.cn/problems/counting-bits/)
+
+## 题目
+
+`n`是一个非负整数，以list的形式返回从0到n的所有数字二进制表达中的`"1"`的个数
+
+## Example
+
+```python
+n = 5
+res = [0, 1, 1, 2, 1, 2]
+```
+
+## 思路
+
+说实话一看到这个题目我就想到动态规划（实际上也是动态规划），那重要的就是状态转移方程
+
+定义：`dp[i]`表示数字`i`二进制表示中含有的1的数量
+
+规律：
+
+- 若`i`二进制最后一位为1，那么`dp[i] = dp[i-1] + 1`
+- 若`i`二进制最后一位为0，说明进了位，`dp[i] = dp[i>>1]`
+
+边界条件：
+
+- `dp[0] = 0`
+
+## 题解
+
+```python
+class Solution(object):
+        res = [0] * (n+1)
+        for i in range(1, len(res)):
+            if i & 1 == 1: 
+                # 最后一位为1
+                res[i] = res[i-1] + 1
+            else:
+                res[i] = res[i >> 1]
+        return res
+```
+
