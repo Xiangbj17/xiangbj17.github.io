@@ -1,5 +1,5 @@
 ---
-title: Python Leetcode101 利用数据结构
+title: Python Leetcode101 利用数据结构(1):队列、栈和集合
 date: 2023-01-30 19:37:00 +0800
 categories: [Leetcode, Data Structure]
 tags: [Algorithm]
@@ -10,9 +10,7 @@ render_with_liquid: false
 
 [Python数据结构增强模块 Collections](https://www.cnblogs.com/goldsunshine/p/15760807.html)
 
-## 1. Deque Stack Queue | 双端队列、栈、队列
-
-### (I) 双端队列(deque)：一个非常强大的数据结构
+# (I) 双端队列(deque)：一个非常强大的数据结构
 
 既支持*O*(1)随机读取，又支持*O*(1)时间的头部增删和尾部增删，不过有一定的额外开销。
 
@@ -59,7 +57,7 @@ deque([-1, -2, 1, 2, 3])
 
 ```
 
-### (II) Stack | 栈 or 堆叠
+# (II) Stack | 栈 or 堆叠
 
 栈是后入先出(LIFO)的数据结构，默认基于List实现，通常用于深度优先搜索，字符串匹配等问题
 
@@ -69,7 +67,7 @@ deque([-1, -2, 1, 2, 3])
 4
 ```
 
-### (III) Queue | 队列
+# (III) Queue | 队列
 
 队列是先入先出(FIFO)的数据结构，默认基于List实现，通常用于广度优先搜索
 
@@ -79,7 +77,7 @@ deque([-1, -2, 1, 2, 3])
 1
 ```
 
-### (IV) Priority Queue | 优先队列
+# (IV) Priority Queue | 优先队列
 
 [优先队列](https://geek-docs.com/python/python-examples/python-priority-queue.html)是优先值先出的数据结构，可以使用`queue.PriorityQueue`实现
 
@@ -105,7 +103,113 @@ deque([-1, -2, 1, 2, 3])
 (3, 'three')
 ```
 
+也可以使用heapq实现最小堆，从而实现优先队列
 
+- heapq建立序列的两种方法
+
+```python
+>>> import heapq
+
+# 第一种，使用heapq.heappush()一个一个加进去
+>>> data = [5, 8, 6, 3, 4, 7, 0, 1, 2, 9]
+>>> 
+>>> heap = []
+>>> for i in data:
+...     heapq.heappush(heap, i)
+>>> heap
+[0, 1, 3, 2, 5, 7, 6, 8, 4, 9]
+
+# 第二种，使用heapify()直接来整理数组
+>>> data = [5, 8, 6, 3, 4, 7, 0, 1, 2, 9]
+>>> heapq.heapify(data)
+>>> data
+[0, 1, 5, 2, 4, 7, 6, 3, 8, 9]
+```
+
+- heappop(heap)：将数组堆中的最小元素弹出
+
+  ```python
+  >>> heapq.heappop(data)
+  0
+  ```
+
+- nlargest()和nsmallest()：用来寻找任何可迭代的对象iter中第n大或者第n小的元素
+
+  ```python
+  >>> heapq.nlargest(3, data)
+  [9, 8, 7]
+  
+  >>> heapq.nsmallest(5, data)
+  [1, 2, 3, 4, 5]
+  ```
+
+  
+
+# (V) 集合 | Set
+
+集合（set）是一个**无序的不重复**元素序列。
+
+- 创建一个空集合：`set()`
+
+- 用一些已有元素创建集合：
+
+  - `x = {1, 2, 3, 1, 1, 1}` => 最终会有： `x = {1, 2, 3}`
+  - 或者`m = [1, 2, 3, 1, 1, 1], x = set(m)`，效果同上
+
+- 集合加元素或者减元素
+
+  ```python
+  >>> x = {1, 2, 3, 1, 1, 1}
+  >>> x
+  {1, 2, 3}
+  
+  # 添加一个元素,add()
+  >>> x.add(0)
+  >>> x
+  {0, 1, 2, 3}
+  
+  # 添加多个元素，update()
+  >>> x.update([6, 6, 6, 8])
+  >>> x
+  {0, 1, 2, 3, 6, 8}
+  
+  # 移除元素，remove(),不存在元素会报错
+  >>> x.remove(8)
+  >>> x
+  {0, 1, 2, 3, 6}
+  
+  # 移除元素，discard()，不存在不会报错
+  >>> x.discard(5)
+  >>> x
+  {0, 1, 2, 3, 6}
+  ```
+
+  
+
+- 两个集合间的运算
+
+```python
+>>> a = set('abracadabra')
+>>> b = set('alacazam')
+>>> a                                  
+{'a', 'r', 'b', 'c', 'd'}
+
+# 集合a中包含而集合b中不包含的元素
+>>> a - b                              
+{'r', 'd', 'b'}
+
+# 集合a或b中包含的所有元素
+>>> a | b                              
+{'a', 'c', 'r', 'd', 'b', 'm', 'z', 'l'}
+
+# 集合a和b中都包含了的元素
+>>> a & b                              
+{'a', 'c'}
+
+# 不同时包含于a和b的元素
+>>> a ^ b                             
+{'r', 'd', 'b', 'm', 'z', 'l'}
+```
 
 # 数组和矩阵相关问题
 
@@ -498,5 +602,112 @@ class Solution(object):
         if not stack:
             return True
         return False
+```
+
+# 单调栈
+
+单调栈通过维持栈内值的单调递增或递减特性，在O(n)时间内处理需要比较大小的问题。
+
+最常见的就是「找元素右边第一个大于其的元素」这类问题。
+
+# 739. [Daily Temperatures (Medium)](https://leetcode.cn/problems/daily-temperatures/)
+
+## 题目
+
+`temperatures`是一个记录每日温度的数组，返回一个数组`answer`，其中：
+
+`answer[i]`表示对于第`i`天，下一个更高温度出现在第几天后。若今后气温都低于该天，则为`0`
+
+## Example
+
+```python
+temperatures = [73,74,75,71,69,72,76,73]
+res = [1,1,4,2,1,1,0,0]
+```
+
+## 思路
+
+这是一个还没遇到过的解题思路，总体想法是这样：
+
+- 建一个栈，用来存储还没能找到「在他后面且比他大的温度」的位置，一开始为空
+- 从左向右遍历`temperatures`数组，假设当前的位置和温度分别为`(i, t)`
+  - 如果栈为空，直接将`(i, t)`入栈，`continue`
+  - 如果栈非空，我们从栈顶开始，一个个对比栈内元素`pre_t`和当前`t`的大小：
+    - 如果小于`t`，说明这个`i`是`pre_t`对应日期之后第一个比他大的日期：
+      - 很高兴，我们为`pre_i`这个位置找到了解，有`res[pre_i] = i - pre_i`
+      - 然后，继续看栈里面还有没有比`t`小的元素
+    - 如果大于或者等于`t`，说明栈里面的元素没有比当前元素更小的了
+      - 那么我们把`(i, t)`入栈
+- 遍历完之后，如果栈里面还有元素，说明这些元素后面没有比它更高的温度了，直接设为`0`
+
+可以看看这个[视频](https://leetcode.cn/problems/daily-temperatures/solution/leetcode-tu-jie-739mei-ri-wen-du-by-misterbooo/)，很清晰
+
+## 题解
+
+```python
+class Solution(object):
+    def dailyTemperatures(self, temperatures):
+        res = [0] * len(temperatures)
+        stack = []
+        for i, t in enumerate(temperatures):
+            while stack and t > temperatures[stack[-1]]:
+                # 只要stack不为空，且当前温度大于栈顶温度，就一直操作
+                pre_i = stack.pop()
+                res[pre_i] = i - pre_i
+            stack.append(i)
+        return res
+```
+
+# 优先队列
+
+优先队列(priority queue) 可以在*O*(1) 时间内获得最大值，并且可以在 *O*(log *n*) 时间内取出最大值或插入任意值。
+
+优先队列常常用[堆(heap)](https://www.youtube.com/watch?v=j-DqQcNPGbE)来实现。堆是一个完全二叉树，其每个节点的值总是大于等于子节点的值。
+
+实际实现堆时，我们通常用一个数组而不是用指针建立一个树。这是因为堆是完全二叉树，所以用数组表示时，位置 `i` 的节点的父节点位置一定为 `(i-1) // 2`，而它的两个子节点的位置又一定分别为 `2i+1` 和 `2i+2`
+
+# 23. [Merge k Sorted Lists (Hard)](https://leetcode.cn/problems/merge-k-sorted-lists/)
+
+## 题目
+
+给定`k`个增序的链表，把它们合并成一条链表
+
+## Example
+
+```python
+lists = [[1,4,5],[1,3,4],[2,6]]
+res = [1,1,2,3,4,4,5,6]
+```
+
+## 思路
+
+这一题，其实只要知道“优先队列”是一个提示，做起来就很简单了。
+
+我感觉这个题难度可以放Medium甚至Easy，因为我这种人基本没啥问题都能一下写出来。
+
+其实就是把所有链表的头都放在最小堆里面，每次取最小的那个头加在最终的链表里面，就行。
+
+## 题解
+
+```python
+class Solution(object):
+    def mergeKLists(self, lists):
+        import heapq
+        # 初始化pointers
+        pointers = []
+        for i in lists:
+            if not i:
+                continue
+            heapq.heappush(pointers, (i.val, i))
+        # pointers = [(1, node1), (1, node2)...]
+        head = ListNode() # 创建一个假头结点
+        last = head
+        while pointers:
+            _, temp_node = heapq.heappop(pointers)
+            last.next = temp_node
+            if temp_node.next:
+                heapq.heappush(pointers, (temp_node.next.val, temp_node.next))
+            last = temp_node
+        return head.next
 ```
 
