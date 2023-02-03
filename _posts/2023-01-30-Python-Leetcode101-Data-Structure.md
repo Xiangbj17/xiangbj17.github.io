@@ -711,3 +711,95 @@ class Solution(object):
         return head.next
 ```
 
+# 218. [The Skyline Problem (Hard)](https://leetcode.cn/problems/the-skyline-problem/)
+
+这个题太难了，建议温习的时候直接看这个[视频](https://www.youtube.com/watch?v=GSBLe8cKu0s)
+
+## 题解
+
+```python
+from sortedcontainers import SortedDict
+
+class Solution(object):
+    def getSkyline(self, buildings):
+        """
+        我们需要的sort条件:
+        1. 如果左端点相同，queue里优先放更高的
+        2. 如果右端点相同，queue里优先放更低的
+        3. 如果一个左端点和一个右端点重合，先处理右端点，再加入左端点
+        """
+        # 首先，把所有的点左右端点拿出来排个序
+        records = []
+        for left, right, height in buildings:
+            # 如果是左端点，取负作为标记,这样排序的时候高楼会在前。条件1达成。
+            # 如果是左端点，取正作为标记，这样最小堆排序，低楼在前。条件2达成。
+            heapq.heappush(records, (left, -height)) 
+            heapq.heappush(records, (right, height))
+        
+        # 为了解决条件3，使用一个SortedDict()维护不同高度的建筑数量
+        # 高度为地平线的建筑始终至少有1个(可以理解为从0到inf有个高度为0的建筑)
+        lives = SortedDict()
+        lives[0] = 1
+
+        res = []
+
+        while records:
+            # 取出当前第一个点
+            x, h = heapq.heappop(records)
+            # 分左点（入点）和右点（出点）讨论
+            if h < 0:
+                if h in lives:
+                    lives[h] += 1
+                else:
+                    lives[h] = 1
+                    # 如果当前值h是dict.value中的最大值，说明是最高
+                    if h == lives.keys()[0]:
+                        res.append([x, -h])
+            else:
+                lives[-h] -= 1
+                if not lives[-h]:
+                    # 先把key从dict中移除
+                    lives.pop(-h)
+                    temp_max = lives.keys()[0]
+                    # 如果最高值变小了，说明这个地方出现了一个落点
+                    if -temp_max < h:
+                        res.append([x, -temp_max])
+        return res
+```
+
+# 双端队列
+
+# 239. [Sliding Window Maxmun (Hard)](https://leetcode.cn/problems/sliding-window-maximum/)
+
+```python
+class Solution:
+    def maxSlidingWindow(self, nums, k):
+        # 如果数组为空或 k = 0，直接返回空
+        if not nums or not k:
+            return []
+        # 如果数组只有1个元素，直接返回该元素
+        if len(nums) == 1:
+            return [nums[0]]
+
+        # 初始化队列和结果，队列存储数组的下标
+        queue = []
+        res = []
+
+        for i in range(len(nums)):
+            # 如果当前队列最左侧存储的下标等于 i-k 的值，代表目前队列已满。
+            # 但是新元素需要进来，所以列表最左侧的下标出队列
+            if queue and queue[0] == i - k:
+                queue.pop(0)
+
+            # 对于新进入的元素，如果队列前面的数比它小，那么前面的都出队列
+            while queue and nums[queue[-1]] < nums[i]:
+                queue.pop()
+            # 新元素入队列
+            queue.append(i)
+
+            # 当前的大值加入到结果数组中
+            if i >= k-1:
+                res.append(nums[queue[0]])
+        return res
+```
+
