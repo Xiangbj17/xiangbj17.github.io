@@ -191,3 +191,121 @@ class Solution(object):
                 return [i, d[nums[i]]]
 ```
 
+
+
+# 128. [Longest Consecutive Sequence (Medium)](https://leetcode.cn/problems/longest-consecutive-sequence/)
+
+## 题意
+
+给定一个乱序的数组`nums`，找出其中最长的连续序列，不要求数在数组中挨在一起。
+
+要求设计一个时间复杂度为`O(n)`的算法
+
+## Example
+
+```python
+nums = [100,4,200,1,3,2]
+res = 4
+# 最长数字连续序列是 [1, 2, 3, 4], 它的长度为 4。
+```
+
+## 思路
+
+### 为什么哈希表耗时低
+
+要求时间复杂度为`O(n)`了，那么就肯定与sort无瓜，也不要去考虑什么左右指针什么的了，只能用内存换时间。
+
+hash table确实是一个好东西，比如：
+
+- 我要查`4`这个元素在不在一个`list`里面，我需要用`4 in list`来查询，这个复杂度是`O(n)`级别的
+- 但如果我要查它在不在`hash table`里，我只需要看`hash[4]`有没有值即可，也`dict.get()`方法，复杂度`O(1)`
+
+这下问题就简单了，我们把题目给出的`nums`组织成`hash table`，然后查询，就可以使得时间复杂度大大减小
+
+### 如何利用表来求最长连续序列
+
+假设我们为上面的example建立了一个表：`{100:True, 4:True, 200:True, ...}`【遍历一次】
+
+每次我们从中`popitem()`：【遍历第二次】
+
+- 比如拿到一个`100`， 我们去查表里有没有99和101，没有的话就算了。
+- 第二次，我们拿到4，我们去查表里有没有3，发现有3，进而再发现2和1，边查边删，并记录下来这个长度。
+
+这样，我们也只遍历了两次，两次的操作都是`O(n)`级别的，所以最后也是`O(n)`
+
+## 题解
+
+```python
+class Solution(object):
+    def longestConsecutive(self, nums):
+        if not nums:
+            return 0
+        d = {}
+        for num in nums:
+            d[num] = True
+        res = 1
+        while d:
+            temp_num, _ = d.popitem()
+            prev, nex = temp_num - 1, temp_num + 1
+            while d.get(prev, False):
+                del d[prev]
+                prev -= 1
+            while d.get(nex, False):
+                del d[nex]
+                nex += 1 
+            temp_len = nex - prev - 1
+            res = max(res, temp_len)
+        return res
+```
+
+# 149. [Max Points On A Line (Hard)](https://leetcode.cn/problems/max-points-on-a-line/)
+
+## 题目
+
+给定一个数组`points`，每个元素表示坐标系中的一个点，求有多少个点在同一条直线上
+
+## Example
+
+<img src="https://assets.leetcode.com/uploads/2021/02/25/plane2.jpg" alt="img" style="zoom:50%;" />
+
+```python
+points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]
+res = 4
+```
+
+## 思路
+
+使用「一个点 + 一条斜率」确定一条直线法。
+
+那么，以每个点`(x_k, y_k)`为基准点，计算其他的点与它的斜率，用`hash`表存储每个斜率对应有多少个点即可。
+
+可以取巧的地方：以第`i`个点为基准的时候，只需要看第`i+1`个点后面的情况，因为前面已经考虑过`i`前面的点了
+
+## 题解
+
+```python
+class Solution(object):
+    def maxPoints(self, points):
+      """用时48ms，击败98.21%；内存13.1MB，击败58.93%"""
+        if len(points) <= 2:
+            return len(points)
+        res = 0
+        d = defaultdict(int)
+        for i in range(0, len(points)):
+            horizon, vertical = 0, 0
+            temp_max = 0
+            for j in range(i+1, len(points)):
+                if points[j][0] == points[i][0]:
+                    vertical += 1
+                elif points[i][1] == points[j][1]:
+                    horizon += 1
+                else:
+                    slope = float(points[j][1] - points[i][1]) / float(points[j][0] - points[i][0])
+                    d[slope] += 1
+                    temp_max = max(temp_max, d[slope])
+            temp_max = max(horizon, vertical, temp_max)
+            res = max(res, temp_max)
+            d.clear()
+        return res+1
+```
+
