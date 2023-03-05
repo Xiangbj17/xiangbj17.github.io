@@ -16,6 +16,8 @@ render_with_liquid: false
 
 这一篇里也重点总结了递归的写法和思路，见 206.Reverse Linked List (Easy) 部分。
 
+下面Leetcode常规链表题型都给了递归和迭代双解法，这类题解法大同小异，看完基本就ok。
+
 # 1 构建链表 | Python
 
 在第一部分，我们用Python构建一个链表类，以及定义一些常用的功能。
@@ -371,5 +373,83 @@ class Solution:
         else:
             list2.next = self.mergeTwoLists(list1, list2.next)
             return list2
+```
+
+
+
+# 24. [Swap Nodes in Pairs (Medium)](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+## 题意
+
+给定一个链表，翻转相邻两个节点的顺序，返回新的链表
+
+## Example
+
+![img](https://assets.leetcode.com/uploads/2020/10/03/swap_ex1.jpg)
+
+## 题解1：递归
+
+这题递归是真好想，一下就能做出来。但还是写一写思路，免得下次忘记了。
+
+第一步：搞清楚递归函数`swapPairs()`的输入输出和函数的功能
+
+- 我们不妨就令这个函数的功能为返回题目想要结果，即，反转相邻节点。
+  - 假如我传进`[1, 2, 3, 4]`，那么返回`[2, 1, 4, 3]`
+  - 假如我传进`[3, 4]`，那么返回`[4, 3]`
+- 从上面的例子可以看出，input是一个头结点`head`，output是我们反转好的链表的头结点
+
+第二步：想终止条件
+
+- 这一步可以代入一些特殊用例来想
+  - 如果传入`[]`，我也需要返回`[]`
+  - 如果传入`[1]`，我也需要返回`[1]`
+- 那么终止条件就很明确了，如果input的`head`是None，或者`head.next`是None，那么直接返回head
+
+第三步：假设如果函数已经帮我处理好了后面的部分，我对当前的部分怎么办
+
+- 比如，对于上面的`Example = [1, 2, 3, 4]`
+  - 假设我当前的`head = 1`，我使用`recursiveRes = swapPairs(head.next.next)`帮我处理好了`[3, 4]`，也即，它返回了`[4, 3]`给我，并且我拿到了`4`这个头节点，那么接下来怎么做？
+  - 接下来就很简单。我把`2 -> 1`，也就是`head.next.next = head`
+  - 然后，把`4`接在`1`后面即可，也就是`head.next =  recursiveRes`
+  - 这所有的做完之后，把`2`作为新的头结点传回去就行。
+
+代码如下：
+
+```python
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if not head or not head.next:
+            return head
+        remain = self.swapPairs(head.next.next)
+        new_head = head.next
+        new_head.next = head
+        head.next = remain
+
+        return new_head
+```
+
+
+
+## 解法2：迭代
+
+和前面的迭代方法也差不多，双指针，然后创建一个新头结点，返回新头结点的下一个节点。
+
+```python
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        res = pre = ListNode()
+        cur = head
+        while pre and cur:
+            if cur.next:
+                t = cur.next.next
+                pre.next = cur.next
+                cur.next.next = cur
+                cur.next = None
+                pre, cur = cur, t
+            else:
+                pre.next = cur
+                break
+
+        return res.next
 ```
 
