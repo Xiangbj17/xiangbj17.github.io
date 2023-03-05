@@ -1,6 +1,6 @@
 ---
-title: Python Leetcode101: Linkded List 链表
-date: 2023-03-04 12:07:00 +0800
+title: Python Leetcode101:链表 Linked List
+date: 2023-03-04 12:25:00 +0800
 categories: [Leetcode, LinkedList]
 tags: [Algorithm]
 render_with_liquid: false
@@ -22,7 +22,7 @@ render_with_liquid: false
 
 
 
-## 1.1 构建一个Node()类
+## (1) 构建一个Node()类
 
 链表的组成单位是`Node`，而它本身也是一种数据结构。因此我们先要定义`Node`类，才方便构建链表。
 
@@ -37,7 +37,7 @@ class Node(object):
 
 
 
-## 1.2 构建一个LinkedList()类并检测是否为空
+## (2) 构建一个LinkedList()类并检测是否为空
 
 有了`Node`，很容易构建一个`LinkedList`类了。
 
@@ -64,7 +64,7 @@ True
 
 
 
-## 1.3 在尾部添加元素 | append()
+## (3) 在尾部添加元素 | append()
 
 在`append`的时候，我们需要考虑到链表此时是否是空状态：
 
@@ -94,7 +94,7 @@ False
 
 
 
-## 1.4 打印链表所有的值 | travel()
+## (4) 打印链表所有的值 | travel()
 
 在1.3里面，我们可以通过`l.head.val`来查看头结点的值，但如果要看第二个，第三个节点的值，就很麻烦了。
 
@@ -121,7 +121,7 @@ travel end
 
 
 
-## 1.5 在头部添加元素 | add()
+## (5) 在头部添加元素 | add()
 
 头部添加元素的话，我们就需要为这个元素新建一个节点，把链表的head接在这个节点的后面。然后令这个节点为链表的新head。
 
@@ -146,7 +146,7 @@ travel end
 
 
 
-## 1.6 在链表中插入元素 | insert()
+## (6) 在链表中插入元素 | insert()
 
 插入元素需要传入两个参数：`pos`表示在第几个位置插入，`val`表示插入元素的值。
 
