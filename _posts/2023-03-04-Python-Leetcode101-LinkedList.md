@@ -1,5 +1,5 @@
 ---
-title: Python Leetcode101:链表 Linked List
+title: Python Leetcode101:链表 Linked List [1]
 date: 2023-03-04 12:25:00 +0800
 categories: [Leetcode, LinkedList]
 tags: [Algorithm]
