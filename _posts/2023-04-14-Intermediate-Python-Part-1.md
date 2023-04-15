@@ -90,3 +90,84 @@ arg3: aze
 如果想要在一个函数中同时使用一般参数、不定长列表、不定长键值对，顺序如下：
 
 `def func(farg, *args, **kwargs):`
+
+
+
+# 2 迭代器与生成器 | Iterators & Generators
+
+## (I) 迭代器相关概念
+
+- 可迭代对象**(Iterable)**：任意Python对象，只要定义了「可以返回一个迭代器的`__iter__`方法」，或者定义了「支持下标索引的`__getitem__`方法」，就是一个可迭代对象。
+- 迭代器**(Iterator)**：任意Python对象，只要定义了`__next__`方法，就是一个迭代器。
+- 迭代**(Iteration)**：用循环来遍历某个东西的过程，就叫做迭代。
+
+## (II) 生成器相关概念
+
+生成器**(Generators)**是只能进行一次迭代的迭代器。大部分生成器是以函数来实现的。他们不会返回一个值，而是暂时生出(yield)一个值。一个简单的例子如下：
+
+```python
+def my_generator():
+    for i in ['sls', 'lyx', 'aze']:
+        yield i
+
+>>> for item in my_generator():
+>>>     print(item, end=' ')
+sls lyx aze 
+```
+
+## (III) 生成器的使用场景
+
+在不想同一时间将所有计算出来的大量结果集分配到内存当中，特别是结果集里还包含循环时使用。
+
+许多Python 2里的标准库函数都会返回列表，而Python 3都修改成了返回生成器，这样可以占用更少的资源。
+
+比如，当我们想实现斐波那契数列的时候，低段位的写法是：
+
+```python
+def fibon_low(n):
+    a = b = 1
+    result = []
+    for i in range(n):
+        result.append(a)
+        a, b = b, a + b
+    return result
+
+>>> fibon_low(10)
+[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+```
+
+高段位的写法是，用一个生成器，也即`yield`每一个要返回的元素，而不是返回一整个数组。这样就可以不用 担心函数是否会使用大量资源。
+
+```python
+def fibon_high(n):
+    a = b = 1
+    for i in range(n):
+        yield a
+        a, b = b, a + b
+
+>>> for x in fibon_high(10):
+>>>     print(x, end=' ')
+1 1 2 3 5 8 13 21 34 55 
+```
+
+# 3 Map & Filter & Reduce
+
+## (I) Map
+
+用法：将一个函数映射到一个输入的list的所有元素上
+
+规范：`map(function, list)`
+
+使用场景：假设我们要对一个list的所有元素变成它的平方，有下面几种做法：
+
+```python
+x = [1, 2, 3, 4, 5]
+
+# 最简单的做法
+squared = [i**2 for i in x]
+
+# 使用map的方法
+squared = list(map(lambda i:i**2, x))
+```
+
+注意：一定要使用`list()`将map的返回值重新封装成一个列表，如果忘记的话，square可就是一个迭代器，而不会是一个列表了。
