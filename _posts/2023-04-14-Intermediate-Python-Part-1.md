@@ -171,3 +171,71 @@ squared = list(map(lambda i:i**2, x))
 ```
 
 注意：一定要使用`list()`将map的返回值重新封装成一个列表，如果忘记的话，square可就是一个迭代器，而不会是一个列表了。
+
+## (II) Filter
+
+用法：过滤list中的元素，只有满足要求的元素才会留下来
+
+规范：`filter(function, list)`
+
+Example：筛选出正数`x = list(filter(lambda x: x>0, [-1, 2, -4, 3, 5, -23]))`
+
+注意：和上面一样，也要用list还原，不然就会返回一个迭代器
+
+## (III) Reduce
+
+用法：对一个列表的所有元素进行某些计算，计算完之后只需要返回一个值
+
+规范：
+
+- `from functools import reduce`
+- `reduce(function, list)`
+
+Example：计算一个list中所有元素的乘积 `reduce(labmda x, y: x * y, [1, 2, 3, 4, 5]) => 120` 
+
+# 4 装饰器 | Decorators
+
+Decorator本质上是一个函数。与寻常的函数不同的是，decorator接受的input也是函数，在其内部会为这个函数添加一些功能（进行装饰）。
+
+使用场景比如：在一个工程里，我希望所有的函数在执行的前后都打印一下函数的执行时间，如果这个功能在每个函数里都直接写，就太繁琐了。这时候，就可以写一个打印时间的装饰器，然后给每个函数都给装上。
+
+```python
+import time
+from functools import wraps 
+
+def print_time(some_func):
+    # 这里如果不用wraps，那么some_func.__name__就会返回wrapMyFunction，显然是不希望的
+    @wraps(some_func)
+    def wrapMyFunction():
+        print('*** Func:', some_func.__name__)
+        start = time.time()
+        some_func()
+        Time = time.time() - start
+        print('*** time used:', Time)
+    return wrapMyFunction
+        
+    
+@print_time
+def cal_100():
+    count = 0
+    for i in range(100):
+        count += i
+    print('sum of 1 to 100 is:', count)
+    
+@print_time
+def print_hello():
+    print('Hello!')
+    
+# 验证一下是否可行
+>>> cal_100()
+*** Func: cal_100
+sum of 1 to 100 is: 4950
+*** time used: 4.124641418457031e-05
+
+# 第二个函数的验证
+>>> print_hello()
+*** Func: print_hello
+Hello!
+*** time used: 7.700920104980469e-05
+```
+
