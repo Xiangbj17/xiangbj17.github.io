@@ -1,6 +1,6 @@
 ---
-title: Python Leetcode101: 树 | Tree
-date: 2023-03-11 16:38:00 +0800
+title: Python Leetcode101: 树相关 | Tree
+date: 2023-03-12 16:38:00 +0800
 categories: [Leetcode, Tree]
 tags: [Algorithm]
 render_with_liquid: false
