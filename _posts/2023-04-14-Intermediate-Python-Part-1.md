@@ -1,12 +1,12 @@
 ---
-title: Intermediate Python | Part 1
+title: Intermediate Python
 date: 2023-04-14 23:00:00 +0800
 categories: [Intermediate, Python]
 tags: [Python]
 render_with_liquid: false
 ---
 
-最近看了一些开源的代码，发现自己的码力尚浅，类井底之蛙。果然人还是要不断学习，不断跳出自己的舒适圈，才能有更大的进步。最近Leetcode还是要坚持刷，有时间的话（把前公司的活做完之后）尽量早点把Leetcode101解决。但是Leetcode能解决的也只是思维的部分，更多进阶的用法还是得自己找找其他的路子多看看多学。最好这几段实习完了之后，开始认真做毕设研究的时候，也搞一些开源的东西。
+最近看了一些开源的代码，发现自己的码力尚浅。果然人还是要不断学习，不断跳出自己的舒适圈，才能有更大的进步。最近Leetcode还是要坚持刷，有时间的话（把前公司的活做完之后）尽量早点把Leetcode101解决。但是Leetcode能解决的也只是思维的部分，更多进阶的用法还是得自己找找其他的路子多看看多学。最好这几段实习完了之后，开始认真做毕设研究的时候，也搞一些开源的东西。
 
 话休絮烦，这里给自己开一个新坑，[Intermediate Python](https://docs.pythontab.com/interpy/)，中文是《Python进阶》。主要还是自己多打打书上的案例代码，另外遇到了什么全新的领域也可以在这里做做笔记，以便日后翻阅。
 
@@ -238,4 +238,98 @@ sum of 1 to 100 is: 4950
 Hello!
 *** time used: 7.700920104980469e-05
 ```
+
+
+
+# 5 处理异常
+
+简单的处理异常方式:`try & except`
+
+```python
+try:
+  file = open('aaa.txt', 'r')
+except IOError as e:
+  print('An IOError occur. {}'.format(e.args[-1]))
+```
+
+## (I) 处理多个异常
+
+有三种方式，记一种就行了：把所有异常放到一个tuple里：
+
+```python
+try:
+	file = open('aaa.txt'. 'r')
+except (IOError, EOFError) as e:
+  print("Error occurred. {}".format(e.args[-1]))
+```
+
+## (II) finally从句
+
+包裹到finally从句中的代码不管异常是否触发都将会被执行。
+
+这可以被用来在脚本执行之后做清理工作。一个简单的例子如下：
+
+```python
+try:
+    file = open('test.txt', 'rb')
+except IOError as e:
+    print('An IOError occurred. {}'.format(e.args[-1]))
+finally:
+    print("This would be printed whether or not an exception occurs.")
+```
+
+
+
+
+
+# 6 函数缓存 | Function caching
+
+当一个I/O密集的函数被频繁使用相同的参数调用的时候，函数缓存可以节约时间。在Python 3.2以后版本，有个lru_cache的装饰器，允许我们将一个函数的返回值快速地缓存或取消缓存。
+
+下面是一个使用lru_cache的斐波那契计算器样例：
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=32) # 最多缓存最近多少个返回值
+def fib(n):
+  if n < 2:
+    return n
+  else:
+    return fib(n-1) + fib(n)
+ 
+>>> print([fib(n) for n in range(10)])
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+>>> fib.cache_clear()
+# 清除缓存
+```
+
+
+
+
+
+# 7 上下文管理器 | Context Managers
+
+上下文管理器可以在有需要的时候，精确地分配和释放资源。最广泛的案例是with语句，一个例子如下：
+
+```python
+with open('aa.txt', 'w') as file:
+  file.write('Hello!')
+  
+# 上面的代码和下面这一段代码等价
+
+file = open('aa.txt', 'w')
+try:
+  file.write('Hello')
+finally:
+  file.close()
+
+```
+
+with语句的主要优势在于确保我们的文件会被关闭，而不用关注嵌套代码如何退出。
+
+
+
+
 
